@@ -93,7 +93,7 @@ void video_init(void)
 		pixel_format = GU_PSM_5551;
 
       work_frame = (void *)(PSP_VRAM_TOP - NJEMU_TEX_BUFFER_SIZE); // 0xBC000 or 0x200000 -
-      draw_frame = (void *)(PSP_VRAM_TOP - NJEMU_TEX_BUFFER_SIZE - FRAMESIZE * 1 + 0x10000);
+      draw_frame = (void *)(PSP_VRAM_TOP - NJEMU_TEX_BUFFER_SIZE - FRAMESIZE * 1);
       show_frame = (void *)(PSP_VRAM_TOP - NJEMU_TEX_BUFFER_SIZE - FRAMESIZE * 1);
 
 //      show_frame = (void *)(FRAMESIZE * 0);

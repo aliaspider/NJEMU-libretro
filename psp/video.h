@@ -10,7 +10,8 @@
 #define PSP_VIDEO_H
 
 #define SCR_WIDTH			480
-#define SCR_HEIGHT			272
+//#define SCR_HEIGHT			272
+#define SCR_HEIGHT			240
 #define BUF_WIDTH			512
 #define	FRAMESIZE			(BUF_WIDTH * SCR_HEIGHT * sizeof(UINT16))
 #define	FRAMESIZE32			(BUF_WIDTH * SCR_HEIGHT * sizeof(UINT32))

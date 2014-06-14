@@ -386,7 +386,7 @@ void retro_run()
    sceGuDisable(GU_BLEND);
 
    sceGuEnable(GU_SCISSOR_TEST);
-   sceGuScissor(0, 0, SCR_WIDTH, SCR_HEIGHT);
+   sceGuScissor(0, 0, SCR_WIDTH, 272);
 
    sceGuDepthFunc(GU_GEQUAL);
    sceGuDepthMask(GU_TRUE);
