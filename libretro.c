@@ -16,7 +16,6 @@ static retro_log_printf_t log_cb;
 static retro_video_refresh_t video_cb;
 static retro_input_poll_t input_poll_cb;
 static retro_input_state_t input_state_cb;
-static retro_audio_sample_batch_t audio_batch_cb;
 static retro_environment_t environ_cb;
 
 void retro_get_system_info(struct retro_system_info *info)
@@ -33,7 +32,8 @@ static struct retro_system_timing g_timing;
 void retro_get_system_av_info(struct retro_system_av_info *info)
 {
    g_timing.fps = 60.0;
-   g_timing.sample_rate = 44100;
+//   g_timing.sample_rate = 24000;
+   g_timing.sample_rate = 48000;
 
    struct retro_game_geometry geom = { 160, 144, 160, 144 };
    info->geometry = geom;
@@ -107,6 +107,7 @@ void retro_init()
    strcat(launchDir, "/");
    printf("\n%s\n",launchDir);
 
+   option_sound_enable = 1;
    pad_init();
    video_init();
 //   show_frame = (void *)(0x200000 - FRAMESIZE * 4);
@@ -162,7 +163,6 @@ void retro_set_environment(retro_environment_t cb)
 
 void retro_set_video_refresh(retro_video_refresh_t cb) { video_cb = cb; }
 void retro_set_audio_sample(retro_audio_sample_t cb) { }
-void retro_set_audio_sample_batch(retro_audio_sample_batch_t cb) { audio_batch_cb = cb; }
 void retro_set_input_poll(retro_input_poll_t cb) { input_poll_cb = cb; }
 void retro_set_input_state(retro_input_state_t cb) { input_state_cb = cb; }
 
@@ -368,6 +368,7 @@ void retro_run()
 //   draw_frame = (void*)(0x44000);
 
    timer_update_cpu();
+   render_audio();
 	frames_displayed++;
    update_inputport();
 
@@ -388,6 +389,7 @@ void retro_run()
    sceGuEnable(GU_SCISSOR_TEST);
    sceGuScissor(0, 0, SCR_WIDTH, 272);
 
+
    sceGuDepthFunc(GU_GEQUAL);
    sceGuDepthMask(GU_TRUE);
    sceGuDisable(GU_DEPTH_TEST);
@@ -398,6 +400,7 @@ void retro_run()
 
    sceGuTexFilter(GU_LINEAR,GU_LINEAR);   
    sceGuFinish();
+
 
    video_cb(texture_vram_p, 384, 224, 512);
 

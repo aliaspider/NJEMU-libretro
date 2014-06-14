@@ -41,4 +41,6 @@ struct sound_t
 
 extern struct sound_t *sound;
 
+void render_audio(void);
+
 #endif /* PSP_SOUND_THREAD_H */
