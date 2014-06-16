@@ -344,7 +344,7 @@ static void timer_update_cpu_normal(void)
 		}
 	}
 
-	if (!skip_this_frame()) neogeo_screenrefresh();
+	neogeo_screenrefresh();
 }
 
 
@@ -410,7 +410,7 @@ static void timer_update_cpu_raster(void)
 		}
 	}
 
-	if (!skip_this_frame()) neogeo_screenrefresh();
+	neogeo_screenrefresh();
 }
 
 

@@ -462,7 +462,7 @@ static void raster_interrupt(int line)
 
 	update_interrupts();
 
-	if (do_refresh && !skip_this_frame())
+	if (do_refresh)
 		neogeo_partial_screenrefresh((raster_counter - 0x100) - 1);
 }
 

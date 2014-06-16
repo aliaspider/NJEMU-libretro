@@ -15,7 +15,6 @@ void blit_scrollh_clear_sprite(UINT16 tpens);
 
 void blit_reset(int bank_scroll1, int bank_scroll2, int bank_scroll3, UINT8 *pen_usage16);
 void blit_start(int high_layer);
-void blit_finish(void);
 
 void blit_update_object(INT16 x, INT16 y, UINT32 code, UINT16 attr);
 void blit_draw_object(INT16 x, INT16 y, UINT32 code, UINT16 attr);

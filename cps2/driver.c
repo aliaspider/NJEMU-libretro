@@ -153,11 +153,7 @@ TIMER_CALLBACK( cps2_raster_interrupt )
 
 	if (scanline >= next_update_first_line)
 	{
-		if (!skip_this_frame())
-		{
-			cps2_screenrefresh(next_update_first_line, scanline);
-		}
-
+		cps2_screenrefresh(next_update_first_line, scanline);
 		next_update_first_line = scanline + 1;
 	}
 }
@@ -168,14 +164,11 @@ TIMER_CALLBACK( cps2_vblank_interrupt )
 	cps1_output[0x52/2] = scanline2;
 	m68000_set_irq_line(2, HOLD_LINE);
 
-	if (!skip_this_frame())
-	{
-		if (next_update_first_line <= LAST_VISIBLE_LINE)
-		{
-			cps2_screenrefresh(next_update_first_line, LAST_VISIBLE_LINE);
-		}
-		blit_finish();
-	}
+   if (next_update_first_line <= LAST_VISIBLE_LINE)
+   {
+      cps2_screenrefresh(next_update_first_line, LAST_VISIBLE_LINE);
+   }
+
 
 	cps2_objram_latch();
 

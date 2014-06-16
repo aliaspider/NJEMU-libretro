@@ -619,8 +619,6 @@ void neogeo_screenrefresh(void)
 
 	draw_fixed_layer();
 
-	blit_finish();
-
 	next_update_first_line = FIRST_VISIBLE_LINE;
 }
 

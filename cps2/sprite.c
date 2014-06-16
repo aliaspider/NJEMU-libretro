@@ -54,18 +54,6 @@ struct object_t
 	OBJECT *next;
 };
 
-static RECT cps_src_clip = { 64, 16, 64 + 384, 16 + 224 };
-
-static RECT cps_clip[6] =
-{
-	{ 48, 24, 48 + 384, 24 + 224 },	// option_stretch = 0  (384x224)
-	{ 60,  1, 60 + 360,  1 + 270 },	// option_stretch = 1  (360x270  4:3)
-	{ 48,  1, 48 + 384,  1 + 270 },	// option_stretch = 2  (384x270 24:17)
-	{ 7,   0,   7+ 466,      272 },	// option_stretch = 3  (466x272 12:7)
-	{ 0,   1, 480,       1 + 270 },	// option_stretch = 4  (480x270 16:9)
-	{ 138, 0, 138 + 204,     272 }	    // option_stretch = 5  (204x272 3:4 vertical)
-};
-
 static INT16 clip_min_y;
 static INT16 clip_max_y;
 
@@ -1078,34 +1066,6 @@ void blit_start(int start, int end)
 	}
 }
 
-
-/*------------------------------------------------------------------------
-	画面の更新終了
-------------------------------------------------------------------------*/
-
-void blit_finish(void)
-{
-   return;
-	if (cps2_has_mask) video_clear_frame(draw_frame);
-
-	if (cps_rotate_screen)
-	{
-		if (cps_flip_screen)
-		{
-			video_copy_rect_flip(work_frame, draw_frame, &cps_src_clip, &cps_src_clip);
-			video_copy_rect(draw_frame, work_frame, &cps_src_clip, &cps_src_clip);
-			video_clear_frame(draw_frame);
-		}
-		video_copy_rect_rotate(work_frame, draw_frame, &cps_src_clip, &cps_clip[5]);
-	}
-	else
-	{
-		if (cps_flip_screen)
-			video_copy_rect_flip(work_frame, draw_frame, &cps_src_clip, &cps_clip[option_stretch]);
-		else
-			video_copy_rect(work_frame, draw_frame, &cps_src_clip, &cps_clip[option_stretch]);
-	}
-}
 
 
 /*------------------------------------------------------------------------

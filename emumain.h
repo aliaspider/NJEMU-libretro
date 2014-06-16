@@ -43,16 +43,8 @@ extern char cache_parent_name[16];
 extern char cache_dir[MAX_PATH];
 #endif
 
-extern int option_showfps;
-extern int option_autoframeskip;
-extern int option_frameskip;
-extern int option_speedlimit;
-extern int option_vsync;
-extern int option_stretch;
 
 extern int option_sound_enable;
-extern int option_samplerate;
-extern int option_sound_volume;
 
 extern int machine_driver_type;
 extern int machine_input_type;
@@ -61,16 +53,6 @@ extern int machine_screen_type;
 extern int machine_sound_type;
 
 extern UINT32 frames_displayed;
-extern int fatal_error;
 
-void emu_main(void);
-
-void autoframeskip_reset(void);
-
-UINT8 skip_this_frame(void);
-void update_screen(void);
-
-void fatalerror(const char *text, ...);
-void show_fatal_error(void);
 
 #endif /* EMUMAIN_H */

@@ -69,8 +69,6 @@ static void cps2_reset(void)
 
    Loop = LOOP_EXEC;
 
-   autoframeskip_reset();
-
    cps2_driver_reset();
    cps2_video_reset();
 
@@ -106,7 +104,6 @@ void retro_init()
    strcat(launchDir, "/");
    printf("\n%s\n",launchDir);
 
-   option_sound_enable = 1;
    pad_init();
    video_init();
 //   show_frame = (void *)(0x200000 - FRAMESIZE * 4);
@@ -283,6 +280,7 @@ size_t retro_get_memory_size(unsigned id)
 
 void retro_run()
 {
+
 //   printf("retro_run()\n");
 //   fflush(stdout);
 
@@ -370,6 +368,8 @@ void retro_run()
    render_audio();
 	frames_displayed++;
    update_inputport();
+
+   //  might be necessary to check video_enable here and draw a black frame instead
 
 //   sceGuSync(0,0);
 //   }

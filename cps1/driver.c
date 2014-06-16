@@ -380,11 +380,9 @@ static void z80_set_bank(UINT32 offset)
 TIMER_CALLBACK( cps1_vblank_interrupt )
 {
 	m68000_set_irq_line(2, HOLD_LINE);
-	if (!skip_this_frame())
-	{
-		cps1_screenrefresh();
-		blit_finish();
-	}
+
+	cps1_screenrefresh();
+
 	cps1_objram_latch();
 }
 

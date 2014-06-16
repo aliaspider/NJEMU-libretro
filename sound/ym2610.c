@@ -2925,7 +2925,7 @@ void YM2610Init(int clock, void *pcmroma, int pcmsizea,
 	/* FM */
 	YM2610.OPN.P_CH = YM2610.CH;
 	YM2610.OPN.ST.clock = clock;
-	YM2610.OPN.ST.rate = sound->frequency >> (2 - option_samplerate);
+	YM2610.OPN.ST.rate = sound->frequency;
 	/* Extend handler */
 	YM2610.OPN.ST.Timer_Handler = TimerHandler;
 	YM2610.OPN.ST.IRQ_Handler   = IRQHandler;
@@ -3072,7 +3072,7 @@ void YM2610_set_samplerate(void)
 {
 	int i;
 
-	YM2610.OPN.ST.rate = sound->frequency >> (2 - option_samplerate);
+	YM2610.OPN.ST.rate = sound->frequency;
 
 	OPNSetPres(&YM2610.OPN, 6*24, 6*24, 4*2); /* OPN 1/6, SSG 1/4 */
 

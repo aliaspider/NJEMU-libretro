@@ -126,7 +126,7 @@ void OKIM6295Init(int clock, int pin7)
 	memset(okim6295, 0, sizeof(okim6295_t));
 
 	okim6295->clock = clock;
-	okim6295->rate  = sound->frequency >> (2 - option_samplerate);
+	okim6295->rate  = sound->frequency;
 	okim6295->source_step = ((okim6295->clock / divisor) << FRAC_BIT) / okim6295->rate;
 	okim6295->stream_pos = 0;
 	okim6295->status = 0;
@@ -168,7 +168,7 @@ void OKIM6295Reset(void)
 
 void OKIM6295_set_samplerate(void)
 {
-	okim6295->rate = sound->frequency >> (2 - option_samplerate);
+	okim6295->rate = sound->frequency;
 	okim6295->source_step = ((okim6295->clock / okim6295->divisor) << FRAC_BIT) / okim6295->rate;
 }
 

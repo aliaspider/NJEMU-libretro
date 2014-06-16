@@ -19,7 +19,6 @@ void blit_set_fix_clear_flag(void);
 
 void blit_reset(void);
 void blit_start(int start, int end);
-void blit_finish(void);
 
 void blit_draw_fix(int x, int y, UINT32 code, UINT16 attr);
 void blit_finish_fix(void);

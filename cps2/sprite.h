@@ -13,7 +13,6 @@ void blit_clear_all_sprite(void);
 
 void blit_reset(void);
 void blit_start(int start, int end);
-void blit_finish(void);
 
 void blit_update_object(INT16 x, INT16 y, UINT32 code, UINT16 attr);
 void blit_draw_object(INT16 x, INT16 y, UINT16 z, INT16 priority, UINT32 code, UINT16 attr);

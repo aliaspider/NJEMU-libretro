@@ -202,9 +202,6 @@ static void sound_update_mono(INT16 *buffer)
 ------------------------------------------------------*/
 int sound_init(void)
 {
-#if (EMU_SYSTEM != CPS2)
-	int sample_shift;
-#endif
 
 #if (EMU_SYSTEM == CPS1)
 	if (machine_sound_type == SOUND_QSOUND)
@@ -231,8 +228,7 @@ int sound_init(void)
 	stream_buffer[1] = stream_buffer_right;
 
 #if (EMU_SYSTEM != CPS2)
-	sample_shift = 2 - option_samplerate;
-	samples_per_update = (((float)sound->frequency / FPS) * 2) / (1 << sample_shift);
+	samples_per_update = ((float)sound->frequency / FPS) * 2;
 
 	samples_left_over   = samples_per_update;
 	samples_this_update = (UINT32)samples_per_update;
@@ -289,8 +285,6 @@ void sound_reset(void)
 #if (EMU_SYSTEM != CPS2)
 void sound_set_samplerate(void)
 {
-	int sample_shift;
-
 #if (EMU_SYSTEM == CPS1)
 	if (machine_sound_type != SOUND_QSOUND)
 		YM2151_set_samplerate();
@@ -298,8 +292,7 @@ void sound_set_samplerate(void)
 	YM2610_set_samplerate();
 #endif
 
-	sample_shift = 2 - option_samplerate;
-	samples_per_update = (((float)sound->frequency / FPS) * 2) / (1 << sample_shift);
+	samples_per_update = ((float)sound->frequency / FPS) * 2;
 
 	samples_left_over   = samples_per_update;
 	samples_this_update = (UINT32)samples_per_update;

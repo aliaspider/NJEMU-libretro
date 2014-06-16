@@ -1675,7 +1675,7 @@ void YM2151Init(int clock, FM_IRQHANDLER IRQHandler)
 	memset(ym2151, 0, sizeof(ym2151_t));
 
 	ym2151->clock      = clock;
-	ym2151->sampfreq   = sound->frequency >> (2 - option_samplerate);
+	ym2151->sampfreq   = sound->frequency;
 	ym2151->irqhandler = IRQHandler;
 
 	init_tables();
@@ -1743,7 +1743,7 @@ void YM2151Reset(void)
 
 void YM2151_set_samplerate(void)
 {
-	ym2151->sampfreq = sound->frequency >> (2 - option_samplerate);
+	ym2151->sampfreq = sound->frequency;
 
 	init_chip_tables();
 

@@ -1505,32 +1505,6 @@ void blit_start(int high_layer)
 
 
 /*------------------------------------------------------------------------
-	スプライト描画終了
-------------------------------------------------------------------------*/
-
-void blit_finish(void)
-{
-	if (cps_rotate_screen)
-	{
-		if (cps_flip_screen)
-		{
-			video_copy_rect_flip(work_frame, draw_frame, &cps_src_clip, &cps_src_clip);
-			video_copy_rect(draw_frame, work_frame, &cps_src_clip, &cps_src_clip);
-			video_clear_frame(draw_frame);
-		}
-		video_copy_rect_rotate(work_frame, draw_frame, &cps_src_clip, &cps_clip[5]);
-	}
-	else
-	{
-		if (cps_flip_screen)
-			video_copy_rect_flip(work_frame, draw_frame, &cps_src_clip, &cps_clip[option_stretch]);
-		else
-			video_copy_rect(work_frame, draw_frame, &cps_src_clip, &cps_clip[option_stretch]);
-	}
-}
-
-
-/*------------------------------------------------------------------------
 	OBJECTテクスチャを更新
 ------------------------------------------------------------------------*/
 

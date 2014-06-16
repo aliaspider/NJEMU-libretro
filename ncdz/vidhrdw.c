@@ -526,8 +526,6 @@ void neogeo_screenrefresh(void)
 		{
 			draw_fix();
 		}
-
-		blit_finish();
 	}
 	else
 	{
@@ -626,7 +624,6 @@ int neogeo_loading_screenrefresh(int flag, int draw)
 	{
 		blit_start(FIRST_VISIBLE_LINE, LAST_VISIBLE_LINE);
 		if (video_enable && !fix_disable) draw_fix();
-		blit_finish();
 		draw = ui_show_popup(1);
 		video_flip_screen(0);
 	}

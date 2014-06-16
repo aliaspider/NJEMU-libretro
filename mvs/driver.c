@@ -491,7 +491,7 @@ void neogeo_raster_interrupt(int line)
 		vblank_interrupt_pending = 1;
 	}
 
-	if (do_refresh && !skip_this_frame())
+	if (do_refresh)
 		neogeo_partial_screenrefresh((raster_counter - 0x100) - 1);
 
 	update_interrupts();
