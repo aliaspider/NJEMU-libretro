@@ -96,18 +96,13 @@ typedef struct rect_t
 
 
 extern UINT8 gulist[GULIST_SIZE];
-extern int video_mode;
 extern void *show_frame;
 extern void *draw_frame;
 extern void *work_frame;
 extern void *tex_frame;
 extern RECT full_rect;
 
-#if PSP_VIDEO_32BPP
-void video_set_mode(int mode);
-#else
-#define video_set_mode(mode)
-#endif
+
 
 void video_init(void);
 void video_exit(void);

@@ -70,7 +70,7 @@ const char *ui_text[UI_TEXT_MAX] =
    "Start save state.",
    "Start load state.",
 #endif
-#if defined(SAVE_STATE) || defined(COMMAND_LIST)
+#if defined(SAVE_STATE)
    "Complete.",
 #endif
 #ifdef SAVE_STATE
@@ -363,35 +363,6 @@ const char *ui_text[UI_TEXT_MAX] =
    "Return to game emulation.",
    "Exit emulator",
    "Exit emulation and return to PSP menu.",
-#ifdef COMMAND_LIST
-   "Show command list",
-   "Show command list. (MAME Plus! format \"command.dat\")",
-#endif
-
-#if PSP_VIDEO_32BPP
-   "Color settings menu",
-   "Background image type",
-   "Background image blightness",
-   "Title bar text",
-   "Selected text",
-   "Normal text",
-   "Information message text",
-   "Warning message text",
-   "File select bar (start)",
-   "File select bar (end)",
-   "Title bar/Message box",
-   "Title bar/ Message box frame",
-   "Background",
-   "Red",
-   "Green",
-   "Blue",
-   "Default image",
-   "User's image",
-   "logo.png only",
-   "File select bar",
-#endif
-
-   "Command list",
 
    /* psp/mp3.c */
 #if (EMU_SYSTEM == NCDZ)
@@ -401,29 +372,11 @@ const char *ui_text[UI_TEXT_MAX] =
    "Could not start MP3 thread.",
 #endif
 
-   /* psp/adhoc.c*/
-#ifdef ADHOC
-   "lobby",
-   "server",
-   "crient",
-   "Waiting for another PSP to join.\n",
-   "Connecting to the %s.",
-   "Connected.",
-   "Disconnecting from the %s.",
-   "Disconnected.",
-   "failed.",
-   "Select a server to connect to, or " FONT_TRIANGLE " to return.\n",
-   "Waiting for %s to accept the connection.\n",
-   "To cancel press " FONT_CROSS ".\n",
-   "%s has requested a connection.\n",
-   "To accept the connection press " FONT_CIRCLE ", to cancel press " FONT_CROSS ".\n",
-   "Wainting for synchronization.",
-#endif
 
    /* psp/png.c */
    "Could not allocate memory for PNG.",
    "Could not enecode PNG image.",
-#if PSP_VIDEO_32BPP || (EMU_SYSTEM == NCDZ)
+#if (EMU_SYSTEM == NCDZ)
    "Could not decode PNG image.",
 #endif
    "%d bit color PNG image not supported.",
@@ -471,26 +424,6 @@ const char *ui_text[UI_TEXT_MAX] =
 #endif
 #endif
 
-#ifdef COMMAND_LIST
-   /* common/cmdlist.c */
-   "Command list for this game not found.",
-   "Command list - %s",
-   "%d/%d items",
-   "COMMAND.DAT size reduction",
-   "This processing removes the command list of the games not being\n",
-   "supported by this emulator from COMMAND.DAT.\n",
-   "If you want to reduce the size of command.dat, press " FONT_CIRCLE " button.\n",
-   "Otherwise, press " FONT_CROSS " button to return to file browser.\n",
-   "Checking COMMAND.DAT format...\n",
-   "ERROR: Unknown format.\n",
-   "ERROR: Empty file.\n",
-   "ERROR: Could not allocate memory.\n",
-   "ERROR: Could not rename file.\n",
-   "ERROR: Could create output file.\n",
-   "Copying \"%s\"...\n",
-   "Original size:%dbytes, Result:%dbytes (-%.1f%%)\n",
-#endif
-
    /* emulation core */
    "Done.\n",
    "Exit emulation",
@@ -499,12 +432,6 @@ const char *ui_text[UI_TEXT_MAX] =
    /* inptport.c */
    "Controller: Player 1",
    "Controller: Player %d",
-#ifdef ADHOC
-   "Lost sync.\n",
-   "Paused by %s",
-   "Return to Game",
-   "Disconnect",
-#endif
 
    /* memintrf.c */
    "Loading \"%s\"\n",

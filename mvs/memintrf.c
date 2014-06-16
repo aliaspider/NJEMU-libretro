@@ -1693,17 +1693,6 @@ int memory_init(void)
 		msg_printf(TEXT(ROMSET_x), game_name);
 	}
 
-#ifdef ADHOC
-	if (!adhoc_enable)
-#endif
-	{
-#ifdef COMMAND_LIST
-		if (parent_name[0])
-			load_commandlist(game_name, parent_name);
-		else
-			load_commandlist(game_name, NULL);
-#endif
-	}
 
 	if ((gfx_pen_usage[0] = memalign(MEM_ALIGN, memory_length_gfx1 / 32)) == NULL)
 	{
@@ -2026,9 +2015,6 @@ void memory_shutdown(void)
 	if (memory_region_user3)  free(memory_region_user3);
 #endif
 
-#if PSP_VIDEO_32BPP
-	GFX_MEMORY = NULL;
-#endif
 }
 
 

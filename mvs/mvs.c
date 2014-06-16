@@ -124,8 +124,6 @@ static int neogeo_init(void)
 
 static void neogeo_reset(void)
 {
-	video_set_mode(16);
-
 	video_clear_screen();
 
 	timer_reset();
@@ -151,7 +149,6 @@ static void neogeo_exit(void)
 	SceUID fd;
 	char path[MAX_PATH];
 
-	video_set_mode(32);
 	video_clear_screen();
 
 	ui_popup_reset();
@@ -181,12 +178,6 @@ static void neogeo_exit(void)
 		}
 
 
-#ifdef COMMAND_LIST
-		free_commandlist();
-#endif
-
-		if (neogeo_save_sound_flag) option_sound_enable = 1;
-		save_gamecfg(game_name);
 	}
 
 	msg_printf(TEXT(DONE2));

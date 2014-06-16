@@ -820,9 +820,6 @@ void memory_shutdown(void)
 	psp2k_mem_left   = PSP2K_MEM_SIZE;
 #endif
 
-#if (USE_CACHE && PSP_VIDEO_32BPP)
-	GFX_MEMORY = NULL;
-#endif
 }
 
 

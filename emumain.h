@@ -15,18 +15,10 @@
 #include "zip/zfile.h"
 #include "common/loadrom.h"
 #include "common/state.h"
-#ifdef ADHOC
-#include "common/adhoc.h"
-#endif
 #if USE_CACHE
 #include "common/cache.h"
 #endif
-#ifdef COMMAND_LIST
-#include "common/cmdlist.h"
-#endif
-#ifdef CHEAT
-#include "common/cheat.h"
-#endif
+
 #if (EMU_SYSTEM == CPS1 || EMU_SYSTEM == CPS2)
 #include "common/coin.h"
 #endif

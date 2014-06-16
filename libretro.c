@@ -83,7 +83,6 @@ static void cps2_reset(void)
 
 static void cps2_exit(void)
 {
-   video_set_mode(32);
    video_clear_screen();
 
    video_clear_screen();

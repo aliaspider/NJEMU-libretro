@@ -36,8 +36,6 @@ static int cpu_reset_flag;
 
 static int neogeo_init(void)
 {
-	video_set_mode(16);
-
 	memset(memory_region_cpu1, 0, 0x200000);
 	memset(memory_region_cpu2, 0, 0x10000);
 
@@ -91,7 +89,6 @@ static int neogeo_init(void)
 
 static void neogeo_reset(void)
 {
-	video_set_mode(16);
 	video_clear_screen();
 
 	autoframeskip_reset();
@@ -149,23 +146,11 @@ static void neogeo_reset(void)
 
 static void neogeo_exit(void)
 {
-	video_set_mode(32);
 	video_clear_screen();
 
 	ui_popup_reset();
 
-	msg_screen_init(WP_LOGO, ICON_SYSTEM, TEXT(EXIT_EMULATION2));
-
-	msg_printf(TEXT(PLEASE_WAIT2));
-
-#ifdef COMMAND_LIST
-	free_commandlist();
-#endif
-	save_gamecfg(game_name);
-
-	msg_printf(TEXT(DONE2));
-
-	show_exit_screen();
+   show_exit_screen();
 	neogeo_boot_bios = 0;
 }
 

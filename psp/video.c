@@ -30,9 +30,7 @@ static int pixel_format;
 ******************************************************************************/
 
 UINT8 ALIGN_PSPDATA gulist[GULIST_SIZE];
-#if PSP_VIDEO_32BPP
-int video_mode = 0;
-#endif
+
 void *show_frame;
 void *draw_frame;
 void *work_frame;
@@ -44,24 +42,6 @@ RECT full_rect = { 0, 0, SCR_WIDTH, SCR_HEIGHT };
 /******************************************************************************
 	グローバル関数
 ******************************************************************************/
-
-/*--------------------------------------------------------
-	ビデオモード設定
---------------------------------------------------------*/
-
-#if PSP_VIDEO_32BPP
-void video_set_mode(int mode)
-{
-	if (video_mode != mode)
-	{
-		if (video_mode) video_exit();
-
-		video_mode = mode;
-
-		video_init();
-	}
-}
-#endif
 
 
 /*--------------------------------------------------------
@@ -77,35 +57,24 @@ void video_set_mode(int mode)
 
 void video_init(void)
 {
-#if PSP_VIDEO_32BPP
-	if (video_mode == 32)
-	{
-		pixel_format = GU_PSM_8888;
 
-		show_frame = (void *)(FRAMESIZE32 * 0);
-		draw_frame = (void *)(FRAMESIZE32 * 1);
-		work_frame = (void *)(FRAMESIZE32 * 2);
-		tex_frame  = (void *)(FRAMESIZE32 * 3);
-	}
-	else
-#endif
-	{
-		pixel_format = GU_PSM_5551;
 
-      work_frame = (void *)(PSP_VRAM_TOP - NJEMU_TEX_BUFFER_SIZE); // 0xBC000 or 0x200000 -
-      draw_frame = (void *)(PSP_VRAM_TOP - NJEMU_TEX_BUFFER_SIZE - FRAMESIZE * 1);
-      show_frame = (void *)(PSP_VRAM_TOP - NJEMU_TEX_BUFFER_SIZE - FRAMESIZE * 1);
+   pixel_format = GU_PSM_5551;
+
+   work_frame = (void *)(PSP_VRAM_TOP - NJEMU_TEX_BUFFER_SIZE); // 0xBC000 or 0x200000 -
+   draw_frame = (void *)(PSP_VRAM_TOP - NJEMU_TEX_BUFFER_SIZE - FRAMESIZE * 1);
+   show_frame = (void *)(PSP_VRAM_TOP - NJEMU_TEX_BUFFER_SIZE - FRAMESIZE * 1);
 
 //      show_frame = (void *)(FRAMESIZE * 0);
 //      draw_frame = (void *)(FRAMESIZE * 1);
 
 
 
-      printf("work_frame : %08X \t %u\n",(u32)work_frame,(u32)work_frame);
-      fflush(stdout);
+   printf("work_frame : %08X \t %u\n",(u32)work_frame,(u32)work_frame);
+   fflush(stdout);
 //      work_frame = (void *)(0xF0000 );
 
-	}
+
 
 	sceGuDisplay(GU_FALSE);
 	sceGuInit();
@@ -196,12 +165,7 @@ void video_flip_screen(int vsync)
 
 void *video_frame_addr(void *frame, int x, int y)
 {
-#if PSP_VIDEO_32BPP
-	if (video_mode == 32)
-		return (void *)(((UINT32)frame | 0x44000000) + ((x + (y << 9)) << 2));
-	else
-#endif
-		return (void *)(((UINT32)frame | 0x44000000) + ((x + (y << 9)) << 1));
+	return (void *)(((UINT32)frame | 0x44000000) + ((x + (y << 9)) << 1));
 }
 
 

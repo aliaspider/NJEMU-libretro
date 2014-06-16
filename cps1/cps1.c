@@ -75,7 +75,6 @@ static int cps1_init(void)
 
 static void cps1_reset(void)
 {
-	video_set_mode(16);
 	video_clear_screen();
 
 	Loop = LOOP_EXEC;
@@ -98,7 +97,6 @@ static void cps1_reset(void)
 
 static void cps1_exit(void)
 {
-	video_set_mode(32);
 	video_clear_screen();
 
 	ui_popup_reset();
@@ -111,21 +109,8 @@ static void cps1_exit(void)
 	cps1_video_exit();
 	cps1_driver_exit();
 
-#ifdef ADHOC
-	if (!adhoc_enable)
-#endif
-	{
-#ifdef COMMAND_LIST
-		free_commandlist();
-#endif
-		save_gamecfg(game_name);
-	}
-
 	msg_printf(TEXT(DONE2));
 
-#ifdef ADHOC
-	if (adhoc_enable) adhocTerm();
-#endif
 
 	show_exit_screen();
 }
