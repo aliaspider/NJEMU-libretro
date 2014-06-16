@@ -28,9 +28,6 @@ int af_interval = 1;
 ******************************************************************************/
 
 static UINT8 ALIGN_DATA input_flag[MAX_INPUTS];
-static int ALIGN_DATA af_map1[CPS1_BUTTON_MAX];
-static int ALIGN_DATA af_map2[CPS1_BUTTON_MAX];
-static int ALIGN_DATA af_counter[CPS1_BUTTON_MAX];
 static int input_analog_value[2];
 static int input_ui_wait;
 static int service_switch;
@@ -39,41 +36,6 @@ static int p12_start_pressed;
 /******************************************************************************
 	・□`・ォ・□vハ□
 ******************************************************************************/
-
-/*------------------------------------------------------
-	゜Bノ茹ユ・鬣ー、□□ツ
-------------------------------------------------------*/
-
-static UINT32 update_autofire(UINT32 buttons)
-{
-	int i;
-
-	for (i = 0; i < input_max_buttons; i++)
-	{
-		if (af_map1[i])
-		{
-			if (buttons & af_map1[i])
-			{
-				buttons &= ~af_map1[i];
-
-				if (af_counter[i] == 0)
-					buttons |= af_map2[i];
-				else
-					buttons &= ~af_map2[i];
-
-				if (++af_counter[i] > af_interval)
-					af_counter[i] = 0;
-			}
-			else
-			{
-				af_counter[i] = 0;
-			}
-		}
-	}
-
-	return buttons;
-}
-
 
 /*------------------------------------------------------
 	CPS1 ・ンゥ`・ネ0 (START / COIN)
@@ -733,9 +695,7 @@ int input_init(void)
 	service_switch = 0;
 	p12_start_pressed = 0;
 	
-	memset(cps1_port_value, 0xff, sizeof(cps1_port_value));
-	memset(af_counter, 0, sizeof(af_counter));
-	memset(input_flag, 0, sizeof(input_flag));
+	memset(cps1_port_value, 0xff, sizeof(cps1_port_value));	
 
 	input_analog_value[0] = 0;
 	input_analog_value[1] = 0;
@@ -814,26 +774,22 @@ int input_init(void)
 		break;
 	}
 
-#ifdef ADHOC
-	if (adhoc_enable)
-		return adhoc_start_thread();
-#endif
+   input_map[P1_UP]=PSP_CTRL_UP;
+	input_map[P1_DOWN]=PSP_CTRL_DOWN;
+	input_map[P1_LEFT]=PSP_CTRL_LEFT;
+	input_map[P1_RIGHT]=PSP_CTRL_RIGHT;
+	input_map[P1_BUTTON1]=PSP_CTRL_CROSS;
+	input_map[P1_BUTTON2]=PSP_CTRL_LTRIGGER;
+	input_map[P1_BUTTON3]=PSP_CTRL_SQUARE;
+	input_map[P1_BUTTON4]=PSP_CTRL_CIRCLE;
+	input_map[P1_BUTTON5]=PSP_CTRL_RTRIGGER;
+	input_map[P1_BUTTON6]=PSP_CTRL_TRIANGLE;
+	input_map[P1_START]=PSP_CTRL_START;
+	input_map[P1_COIN]=PSP_CTRL_SELECT;
 
 	return 1;
 }
 
-
-/*------------------------------------------------------
-	ネ□ヲ・ンゥ`・ネ、ホスKチヒ
-------------------------------------------------------*/
-
-void input_shutdown(void)
-{
-#ifdef ADHOC
-	if (adhoc_enable)
-		adhoc_stop_thread();
-#endif
-}
 
 
 /*------------------------------------------------------
@@ -859,163 +815,53 @@ void update_inputport(void)
 	int i, serv_switch = 0;
 	UINT32 buttons;
 
-#ifdef ADHOC
-	if (adhoc_enable)
-	{
-#if !ADHOC_UPDATE_EVERY_FRAME
-		if (adhoc_frame & 1)
-		{
-			adhoc_frame++;
-		}
-		else
-#endif
-		{
-			while (adhoc_update && Loop == LOOP_EXEC)
-			{
-				sceKernelDelayThread(1);
-			}
 
-			cps1_port_value[0] = send_data.port_value[0] & recv_data.port_value[0];
-			cps1_port_value[1] = send_data.port_value[1] & recv_data.port_value[1];
-			cps1_port_value[2] = send_data.port_value[2] & recv_data.port_value[2];
-			cps1_port_value[3] = send_data.port_value[3] & recv_data.port_value[3];
+   service_switch = 0;
+   p12_start_pressed = 0;
 
-			if (machine_input_type == INPTYPE_forgottn)
-			{
-				if (adhoc_server)
-				{
-					input_analog_value[0] = send_data.port_value[4];
-					input_analog_value[1] = recv_data.port_value[5];
-				}
-				else
-				{
-					input_analog_value[0] = recv_data.port_value[4];
-					input_analog_value[1] = send_data.port_value[5];
-				}
-			}
+   buttons = poll_gamepad();
 
-			if (Loop == LOOP_EXEC)
-				Loop = recv_data.loop_flag;
+   if ((buttons & PSP_CTRL_LTRIGGER) && (buttons & PSP_CTRL_RTRIGGER))
+   {
+      if (buttons & PSP_CTRL_SELECT)
+      {
+         buttons &= ~(PSP_CTRL_SELECT | PSP_CTRL_LTRIGGER | PSP_CTRL_RTRIGGER);
+         serv_switch = 1;
+      }
+      else if (buttons & PSP_CTRL_START)
+      {
+         buttons &= ~(PSP_CTRL_START | PSP_CTRL_LTRIGGER | PSP_CTRL_RTRIGGER);
+         p12_start_pressed = 1;
+      }
+   }
 
-			if (recv_data.paused)
-				adhoc_paused = recv_data.paused;
+   buttons = adjust_input(buttons);
 
-			if (adhoc_paused)
-			{
-				adhoc_pause();
-			}
-			
-			service_switch = 0;
-			p12_start_pressed = 0;
-			
-			buttons = poll_gamepad();
+   for (i = 0; i < MAX_INPUTS; i++)
+      input_flag[i] = (buttons & input_map[i]) != 0;
 
-			if (readHomeButton())
-			{
-				buttons = 0;
-				adhoc_paused = adhoc_server + 1;
-			}
-			else if ((buttons & PSP_CTRL_LTRIGGER) && (buttons & PSP_CTRL_RTRIGGER))
-			{
-				if (buttons & PSP_CTRL_SELECT)
-				{
-					buttons &= ~(PSP_CTRL_SELECT | PSP_CTRL_LTRIGGER | PSP_CTRL_RTRIGGER);
-					serv_switch = 1;
-				}
-				else if (buttons & PSP_CTRL_START)
-				{
-					buttons &= ~(PSP_CTRL_START | PSP_CTRL_LTRIGGER | PSP_CTRL_RTRIGGER);
-					p12_start_pressed = 1;
-				}
-			}
+   if (serv_switch) input_flag[SERV_SWITCH] = 1;
 
-			buttons = adjust_input(buttons);
-			buttons = update_autofire(buttons);
+   update_inputport0();
+   update_inputport1();
+   update_inputport2();
+   update_inputport3();
+   if (machine_input_type == INPTYPE_forgottn) forgottn_update_dial();
 
-			for (i = 0; i < MAX_INPUTS; i++)
-				input_flag[i] = (buttons & input_map[i]) != 0;
+   if (input_flag[SWPLAYER])
+   {
+      if (!input_ui_wait)
+      {
+         option_controller++;
+         if (option_controller == input_max_players)
+            option_controller = INPUT_PLAYER1;
+         input_ui_wait = 30;
+      }
+   }
 
-			if (serv_switch) input_flag[SERV_SWITCH] = 1;
 
-			update_inputport0();
-			update_inputport1();
-			update_inputport2();
-			update_inputport3();
-			if (machine_input_type == INPTYPE_forgottn) forgottn_update_dial();
+   if (input_ui_wait > 0) input_ui_wait--;
 
-			send_data.buttons   = buttons;
-			send_data.paused    = adhoc_paused;
-			send_data.loop_flag = Loop;
-			send_data.frame     = adhoc_frame++;
-
-			sceKernelDelayThread(100);
-
-			adhoc_update = 1;
-		}
-	}
-	else
-#endif
-	{
-		service_switch = 0;
-		p12_start_pressed = 0;
-		
-		buttons = poll_gamepad();
-
-		if (readHomeButton())
-		{
-			showmenu();
-			setup_autofire();
-			buttons = poll_gamepad();
-		}
-
-		if ((buttons & PSP_CTRL_LTRIGGER) && (buttons & PSP_CTRL_RTRIGGER))
-		{
-			if (buttons & PSP_CTRL_SELECT)
-			{
-				buttons &= ~(PSP_CTRL_SELECT | PSP_CTRL_LTRIGGER | PSP_CTRL_RTRIGGER);
-				serv_switch = 1;
-			}
-			else if (buttons & PSP_CTRL_START)
-			{
-				buttons &= ~(PSP_CTRL_START | PSP_CTRL_LTRIGGER | PSP_CTRL_RTRIGGER);
-				p12_start_pressed = 1;
-			}
-		}
-
-		buttons = adjust_input(buttons);
-		buttons = update_autofire(buttons);
-
-		for (i = 0; i < MAX_INPUTS; i++)
-			input_flag[i] = (buttons & input_map[i]) != 0;
-
-		if (serv_switch) input_flag[SERV_SWITCH] = 1;
-
-		update_inputport0();
-		update_inputport1();
-		update_inputport2();
-		update_inputport3();
-		if (machine_input_type == INPTYPE_forgottn) forgottn_update_dial();
-
-		if (input_flag[SWPLAYER])
-		{
-			if (!input_ui_wait)
-			{
-				option_controller++;
-				if (option_controller == input_max_players)
-					option_controller = INPUT_PLAYER1;
-				ui_popup(TEXT(CONTROLLER_PLAYERx), option_controller + 1);
-				input_ui_wait = 30;
-			}
-		}
-		
-		if (input_flag[COMMANDLIST])
-		{
-			commandlist(1);
-			buttons = poll_gamepad();
-		}
-		
-		if (input_ui_wait > 0) input_ui_wait--;
-	}
 }
 
 
@@ -1046,7 +892,6 @@ STATE_LOAD( input )
 	state_load_long(&cps1_dipswitch[2], 1);
 	state_load_byte(&service_switch, 1);
 
-	setup_autofire();
 	input_ui_wait = 0;
 	p12_start_pressed = 0;
 	service_switch = 0;

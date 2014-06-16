@@ -22,8 +22,6 @@ static int cps2_init(void)
 	if (!cps2_driver_init())
 		return 0;
 
-	msg_printf(TEXT(DONE2));
-
 	return cps2_video_init();
 }
 

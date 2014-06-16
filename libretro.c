@@ -207,7 +207,7 @@ void retro_run()
    //  might be necessary to check video_enable here and draw a black frame instead
 
    sceGuStart(GU_DIRECT, d_list);
-   sceGuTexImage(0, 512, 512, 512, (texture_vram_p + (64 + 16 *512)) );
+   sceGuTexImage(0, 512, 512, BUF_WIDTH, (texture_vram_p + (FRAME_OFFSET_X + FRAME_OFFSET_Y * BUF_WIDTH)) );
    sceGuTexMode(GU_PSM_5551, 0, 0, GU_FALSE);
    sceGuTexFunc(GU_TFX_REPLACE, GU_TCC_RGB);
    sceGuDisable(GU_BLEND);
@@ -228,7 +228,7 @@ void retro_run()
    sceGuFinish();
 
 
-   video_cb(texture_vram_p, 384, 224, 512);
+   video_cb(texture_vram_p, FRAME_WIDTH, FRAME_HEIGHT, BUF_WIDTH);
 
 }
 

@@ -52,6 +52,8 @@
 
 #define APPNAME_STR				"CAPCOM CPS1 Emulator for PSP"
 #define machine_main			cps1_main
+#define machine_reset		cps1_reset
+#define machine_exit			cps1_exit
 
 #define EMU_SYSTEM				CPS1
 #define SYSTEM_NAME				"CPS1"
@@ -62,6 +64,10 @@
 #define GULIST_SIZE				48*1024		// 48KB
 #define ENABLE_RASTER_OPTION	1			// on
 
+#define FRAME_WIDTH     384
+#define FRAME_HEIGHT    224
+#define FRAME_OFFSET_X  64
+#define FRAME_OFFSET_Y  16
 
 /******************************************************************************
 	CPS2PSP、ホヤOカィ
@@ -88,6 +94,10 @@
 #define GULIST_SIZE				48*1024		// 48KB
 #define ENABLE_RASTER_OPTION	0			// off
 
+#define FRAME_WIDTH     384
+#define FRAME_HEIGHT    224
+#define FRAME_OFFSET_X  64
+#define FRAME_OFFSET_Y  16
 
 /******************************************************************************
 	MVSPSP、ホヤOカィ
@@ -106,6 +116,10 @@
 #define CACHE_VERSION			"V23"
 #define GULIST_SIZE				300*1024	// 300KB
 
+#define FRAME_WIDTH     336
+#define FRAME_HEIGHT    240
+#define FRAME_OFFSET_X  24
+#define FRAME_OFFSET_Y  16
 
 /******************************************************************************
 	NCDZPSP、ホヤOカィ
@@ -122,6 +136,11 @@
 #define TICKS_PER_FRAME			16896.0
 #define USE_CACHE				0
 #define GULIST_SIZE				300*1024	// 300KB
+
+#define FRAME_WIDTH     336
+#define FRAME_HEIGHT    240
+#define FRAME_OFFSET_X  24
+#define FRAME_OFFSET_Y  16
 
 #endif
 

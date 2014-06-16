@@ -503,6 +503,7 @@ enum
 extern const char *ui_text[UI_TEXT_MAX];
 
 #define msg_printf printf
+#define fatalerror printf
 //void msg_printf(const char *text, ...);
 
 #endif /* UI_TEXT_H */

@@ -1,4 +1,4 @@
-SYSTEM   = cps2
+SYSTEM   = cps1
 PSP      = slim
 DEBUG    = 0
 

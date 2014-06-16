@@ -24,6 +24,8 @@
 #include "sprite.h"
 #include "vidhrdw.h"
 
-void cps1_main(void);
+void cps1_reset(void);
+void cps1_exit(void);
+int cps1_main(void);
 
 #endif /* CPS1_H */

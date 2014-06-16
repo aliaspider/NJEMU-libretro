@@ -56,18 +56,6 @@ struct object_t
 	struct Vertex vertices[2];
 };
 
-static RECT cps_src_clip = { 64, 16, 64 + 384, 16 + 224 };
-
-static RECT cps_clip[6] =
-{
-	{ 48, 24, 48 + 384, 24 + 224 },	// option_stretch = 0  (384x224)
-	{ 60,  1, 60 + 360,  1 + 270 },	// option_stretch = 1  (360x270  4:3)
-	{ 48,  1, 48 + 384,  1 + 270 },	// option_stretch = 2  (384x270 24:17)
-	{ 7,   0,   7+ 466,      272 },	// option_stretch = 3  (466x272 12:7)
-	{ 0,   1, 480,       1 + 270 },	// option_stretch = 4  (480x270 16:9)
-	{ 138, 0, 138 + 204,     272 }  	// option_stretch = 5  (204x272 3:4 vertical)
-};
-
 static INT16 scroll2_min_y;
 static INT16 scroll2_max_y;
 static INT16 scroll2_sy;
