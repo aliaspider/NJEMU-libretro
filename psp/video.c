@@ -31,10 +31,8 @@ static int pixel_format;
 
 UINT8 ALIGN_PSPDATA gulist[GULIST_SIZE];
 
-void *show_frame;
 void *draw_frame;
 void *work_frame;
-void *tex_frame;
 
 RECT full_rect = { 0, 0, SCR_WIDTH, SCR_HEIGHT };
 
@@ -63,25 +61,12 @@ void video_init(void)
 
    work_frame = (void *)(PSP_VRAM_TOP - NJEMU_TEX_BUFFER_SIZE); // 0xBC000 or 0x200000 -
    draw_frame = (void *)(PSP_VRAM_TOP - NJEMU_TEX_BUFFER_SIZE - FRAMESIZE * 1);
-   show_frame = (void *)(PSP_VRAM_TOP - NJEMU_TEX_BUFFER_SIZE - FRAMESIZE * 1);
-
-//      show_frame = (void *)(FRAMESIZE * 0);
-//      draw_frame = (void *)(FRAMESIZE * 1);
-
-
-
-   printf("work_frame : %08X \t %u\n",(u32)work_frame,(u32)work_frame);
-   fflush(stdout);
-//      work_frame = (void *)(0xF0000 );
-
 
 
 	sceGuDisplay(GU_FALSE);
 	sceGuInit();
 
 	sceGuStart(GU_DIRECT, gulist);
-//	sceGuDrawBuffer(pixel_format, draw_frame, BUF_WIDTH);
-//	sceGuDispBuffer(SCR_WIDTH, SCR_HEIGHT, show_frame, BUF_WIDTH);
 	sceGuOffset(2048 - (SCR_WIDTH / 2), 2048 - (SCR_HEIGHT / 2));
 	sceGuViewport(2048, 2048, SCR_WIDTH, SCR_HEIGHT);
 
@@ -116,7 +101,6 @@ void video_init(void)
 	sceGuFinish();
 	sceGuSync(0, GU_SYNC_FINISH);
 
-	video_clear_frame(show_frame);
 	video_clear_frame(draw_frame);
 	video_clear_frame(work_frame);
 
@@ -147,16 +131,6 @@ void video_wait_vsync(void)
 }
 
 
-/*--------------------------------------------------------
-	スクリーンをフリップ
---------------------------------------------------------*/
-
-void video_flip_screen(int vsync)
-{
-	if (vsync) sceDisplayWaitVblankStart();
-	show_frame = draw_frame;
-	draw_frame = sceGuSwapBuffers();
-}
 
 
 /*--------------------------------------------------------
@@ -184,16 +158,6 @@ void video_clear_frame(void *frame)
 	sceGuSync(0, GU_SYNC_FINISH);
 }
 
-
-/*--------------------------------------------------------
-	描画/表示フレームをクリア
---------------------------------------------------------*/
-
-void video_clear_screen(void)
-{
-	video_clear_frame(show_frame);
-	video_clear_frame(draw_frame);
-}
 
 
 /*--------------------------------------------------------

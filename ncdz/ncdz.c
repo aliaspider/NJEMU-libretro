@@ -89,8 +89,6 @@ static int neogeo_init(void)
 
 static void neogeo_reset(void)
 {
-	video_clear_screen();
-
 	autoframeskip_reset();
 
 	timer_reset();

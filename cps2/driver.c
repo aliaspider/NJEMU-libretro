@@ -370,10 +370,7 @@ int cps2_driver_init(void)
 
 void cps2_driver_exit(void)
 {
-#ifdef ADHOC
-	if (!adhoc_enable || adhoc_server)
-#endif
-		cps2_nvram_read_write(1);
+	cps2_nvram_read_write(1);
 }
 
 

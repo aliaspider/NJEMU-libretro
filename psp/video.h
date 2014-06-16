@@ -99,7 +99,6 @@ extern UINT8 gulist[GULIST_SIZE];
 extern void *show_frame;
 extern void *draw_frame;
 extern void *work_frame;
-extern void *tex_frame;
 extern RECT full_rect;
 
 
@@ -108,9 +107,7 @@ void video_init(void);
 void video_exit(void);
 
 void video_wait_vsync(void);
-void video_flip_screen(int vsync);
 void *video_frame_addr(void *frame, int x, int y);
-void video_clear_screen(void);
 void video_clear_frame(void *frame);
 void video_clear_rect(void *frame, RECT *rect);
 void video_fill_frame(void *frame, UINT32 color);

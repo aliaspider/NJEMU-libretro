@@ -52,7 +52,6 @@ void cps2_scan_scroll2_callback(void);
 void cps2_scan_scroll3_callback(void);
 
 int cps2_video_init(void);
-void cps2_video_exit(void);
 void cps2_video_reset(void);
 void cps2_screenrefresh(int start, int end);
 void cps2_objram_latch(void);

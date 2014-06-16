@@ -145,7 +145,6 @@ static void show_loading_image(void)
 	if (load_png(path, -1) == 0)
 		uifont_print_shadow_center(129, COLOR_WHITE, "Now Loading...");
 
-	video_flip_screen(1);
 }
 
 

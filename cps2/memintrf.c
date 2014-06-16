@@ -652,7 +652,6 @@ int memory_init(void)
 	cache_init();
 #endif
 	pad_wait_clear();
-	video_clear_screen();
 
 	msg_printf(TEXT(CHECKING_ROM_INFO));
 

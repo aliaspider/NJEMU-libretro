@@ -81,8 +81,6 @@ static int neogeo_init(void)
 	msg_printf(TEXT(DONE2));
 	msg_screen_clear();
 
-	video_clear_screen();
-
 #ifdef ADHOC
 	if (adhoc_enable)
 	{
@@ -124,8 +122,6 @@ static int neogeo_init(void)
 
 static void neogeo_reset(void)
 {
-	video_clear_screen();
-
 	timer_reset();
 	input_reset();
 
@@ -149,11 +145,8 @@ static void neogeo_exit(void)
 	SceUID fd;
 	char path[MAX_PATH];
 
-	video_clear_screen();
-
 	ui_popup_reset();
 
-	video_clear_screen();
 	msg_screen_init(WP_LOGO, ICON_SYSTEM, TEXT(EXIT_EMULATION2));
 
 	msg_printf(TEXT(PLEASE_WAIT2));
@@ -260,8 +253,6 @@ static void neogeo_run(void)
 			update_screen();
 			update_inputport();
 		}
-
-		video_clear_screen();
 	}
 }
 
