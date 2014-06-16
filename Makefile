@@ -1,15 +1,45 @@
-TARGET := njemu_cps2_libretro_psp1.a
+SYSTEM   = cps2
+TARGET  := njemu_$(SYSTEM)_libretro_psp1.a
+PSP      = slim
 
-CC  = psp-gcc
-AR  = psp-ar
+CC = psp-gcc
+AR = psp-ar
 
 
 DEFINES  += -D__LIBRETRO__ -DPSP
-#DEFINES  += -DVIDEO_RGB565
-DEFINES  += -DBUILD_CPS2PSP=1 -DPSP_SLIM=1 -DPSP_VIDEO_32BPP=0 -DRELEASE=0 -D_PSP_FW_VERSION=150
+DEFINES  += -DRELEASE=0
+# avoids conflict with the variable 'driver' in the frontend's code
 DEFINES  += -Ddriver=njemu_driver -Ddriver_t=njemu_driver_t
 
 #DEFINES  += -DCZ80_USE_JUMPTABLE
+
+ifeq ($(SYSTEM), cps1)
+DEFINES  += -DBUILD_CPS1PSP=1
+INCDIRS := -Icps1
+OBJS    := cps2/cps2.o cps2/cps2crpt.o cps2/driver.o cps2/memintrf.o cps2/inptport.o cps2/timer.o cps2/vidhrdw.o cps2/sprite.o cps2/eeprom.o sound/qsound.o
+
+else ifeq ($(SYSTEM), cps2)
+DEFINES  += -DBUILD_CPS2PSP=1
+INCDIRS := -Icps2
+OBJS    := cps2/cps2.o cps2/cps2crpt.o cps2/driver.o cps2/memintrf.o cps2/inptport.o cps2/timer.o cps2/vidhrdw.o cps2/sprite.o cps2/eeprom.o sound/qsound.o
+
+else ifeq ($(SYSTEM), mvs)
+DEFINES  += -BUILD_MVSPSP=1
+INCDIRS := -Imvs
+OBJS    := cps2/cps2.o cps2/cps2crpt.o cps2/driver.o cps2/memintrf.o cps2/inptport.o cps2/timer.o cps2/vidhrdw.o cps2/sprite.o cps2/eeprom.o sound/qsound.o
+
+else # SYSTEM = ncdz
+DEFINES  += -DBUILD_NCDZPSP=1
+INCDIRS := -Incdz
+OBJS    := cps2/cps2.o cps2/cps2crpt.o cps2/driver.o cps2/memintrf.o cps2/inptport.o cps2/timer.o cps2/vidhrdw.o cps2/sprite.o cps2/eeprom.o sound/qsound.o
+
+endif
+
+ifeq ($(PSP), fat)
+DEFINES += -D_PSP_FW_VERSION=150
+else # psp = slim
+DEFINES += -DPSP_SLIM -D_PSP_FW_VERSION=371
+endif
 
 
 
@@ -30,19 +60,17 @@ CFLAGS += -Werror -fomit-frame-pointer
 #CFLAGS += -falign-functions=32 -falign-loops -falign-labels -falign-jumps
 
 
-OBJS := zip/zfile.o zip/unzip.o
+OBJS += zip/zfile.o zip/unzip.o
 OBJS += common/cache.o common/loadrom.o common/state.o common/coin.o
 OBJS += psp/filer.o psp/ui_text.o psp/input.o psp/ticker.o psp/sound.o psp/video.o
 OBJS += cpu/m68000/m68000.o cpu/m68000/c68k.o cpu/z80/z80.o cpu/z80/cz80.o
 OBJS += sound/sndintrf.o
 
-OBJS += cps2/cps2crpt.o cps2/driver.o cps2/memintrf.o cps2/inptport.o cps2/timer.o cps2/vidhrdw.o cps2/sprite.o cps2/eeprom.o sound/qsound.o
-OBJS += cps2/cps2.o
 
 OBJS += emumain.o
 OBJS += libretro.o
 
-INCDIRS := -I. -Icps2
+INCDIRS += -I.
 INCDIRS += -I$(shell psp-config --pspsdk-path)/include
 #INCDIRS += -I$(shell psp-config --psp-prefix)/include
 

@@ -52,11 +52,9 @@ void cps2_reset(void)
 
 void cps2_exit(void)
 {
-	msg_printf(TEXT(PLEASE_WAIT2));
 	cps2_driver_exit();
    sound_exit();
    memory_shutdown();
-	msg_printf(TEXT(DONE2));
 }
 
 

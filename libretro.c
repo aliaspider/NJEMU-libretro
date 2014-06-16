@@ -20,7 +20,7 @@ static retro_environment_t environ_cb;
 
 void retro_get_system_info(struct retro_system_info *info)
 {
-   info->library_name = "NJEMU";
+   info->library_name = "NJEMU-" SYSTEM_NAME;
    info->library_version = "v0.0.1";
    info->need_fullpath = true;
    info->block_extract = true;
@@ -31,7 +31,7 @@ static struct retro_system_timing g_timing;
 
 void retro_get_system_av_info(struct retro_system_av_info *info)
 {
-   struct retro_game_geometry geom = { 160, 144, 160, 144 };
+   struct retro_game_geometry geom = { 160, 144, 160, 144, 16.0/9.0 };
    info->geometry = geom;
    info->timing   = g_timing;
 }
