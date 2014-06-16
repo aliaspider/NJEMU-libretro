@@ -56,7 +56,7 @@ void retro_init()
 
    pad_init();
    video_init();
-   strcpy(game_dir, launchDir);
+
 
    struct retro_log_callback log;
 
@@ -93,7 +93,7 @@ void retro_set_controller_port_device(unsigned port, unsigned device) {}
 
 void retro_reset()
 {
-   cps2_reset();
+   machine_reset();
 }
 
 
@@ -118,6 +118,7 @@ void retro_cheat_set(unsigned index, bool enabled, const char *code) {}
 
 bool retro_load_game(const struct retro_game_info *info)
 {
+   char* temp_p;
    enum retro_pixel_format fmt = RETRO_PIXEL_FORMAT_RGB565;
    if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt))
    {
@@ -125,8 +126,24 @@ bool retro_load_game(const struct retro_game_info *info)
          log_cb(RETRO_LOG_INFO, "[NJEMU]: RGB565 is not supported.\n");
       return false;
    }
+   strcpy(game_dir, info->path);
 
-   strcpy(game_name, "sfa");
+   temp_p = strrchr(game_dir, '/');
+   if (temp_p)
+   {
+      *temp_p = '\0';
+      strcpy(game_name, temp_p + 1);
+   }
+   else
+   {
+      strcpy(game_dir, ".");
+      strcpy(game_name, info->path );
+   }
+
+
+   temp_p = strchr(game_name, '.');
+   if (temp_p)
+      *temp_p = '\0';
 
    return machine_main();
 }
@@ -137,7 +154,7 @@ bool retro_load_game_special(unsigned game_type, const struct retro_game_info *i
 
 void retro_unload_game()
 {
-   cps2_exit();
+   machine_exit();
 }
 
 unsigned retro_get_region() { return RETRO_REGION_NTSC; }

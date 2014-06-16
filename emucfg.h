@@ -71,6 +71,8 @@
 
 #define APPNAME_STR				"CAPCOM CPS2 Emulator for PSP"
 #define machine_main			cps2_main
+#define machine_reset		cps2_reset
+#define machine_exit			cps2_exit
 
 #define EMU_SYSTEM				CPS2
 #define SYSTEM_NAME				"CPS2"
