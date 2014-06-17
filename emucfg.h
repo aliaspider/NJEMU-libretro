@@ -85,7 +85,9 @@
 #define FPS						59.633333
 #define TICKS_PER_FRAME			16769.144773
 #ifdef PSP_SLIM
-#define USE_CACHE				0
+//#define USE_CACHE				0
+#define USE_CACHE				1
+#define CACHE_VERSION			"V23"
 #else
 #define USE_CACHE				1
 #define CACHE_VERSION			"V22"
@@ -111,7 +113,7 @@
 #define machine_exit			neogeo_exit
 
 #define EMU_SYSTEM				MVS
-#define SYSTEM_NAME				"NEO。、GEO"
+#define SYSTEM_NAME				"NEOGEO"
 #define FPS						59.185606
 #define TICKS_PER_FRAME			16896.0
 #define USE_CACHE				1

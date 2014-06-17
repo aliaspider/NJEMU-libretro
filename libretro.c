@@ -27,13 +27,16 @@ void retro_get_system_info(struct retro_system_info *info)
    info->valid_extensions = "zip";
 }
 
-static struct retro_system_timing g_timing;
-
 void retro_get_system_av_info(struct retro_system_av_info *info)
 {
-   struct retro_game_geometry geom = { 160, 144, 160, 144, 16.0/9.0 };
-   info->geometry = geom;
-   info->timing   = g_timing;
+   info->geometry.base_width   = FRAME_WIDTH;
+   info->geometry.base_height  = FRAME_HEIGHT;
+   info->geometry.max_width    = FRAME_WIDTH;
+   info->geometry.max_height   = FRAME_HEIGHT;
+   info->geometry.aspect_ratio = 16.0/9.0;
+
+   info->timing.fps = FPS;
+   info->timing.sample_rate = sound->frequency;
 }
 
 //void msg_printf(const char *text, ...)
@@ -52,6 +55,10 @@ void retro_init()
 
    getcwd(launchDir, MAX_PATH - 1);
    strcat(launchDir, "/");
+
+   strcpy(cache_dir, launchDir);
+   strcat(cache_dir, "cache");
+
    printf("\n%s\n",launchDir);
 
    pad_init();
@@ -64,13 +71,6 @@ void retro_init()
       log_cb = log.log;
    else
       log_cb = NULL;
-
-
-   if (environ_cb)
-   {
-      g_timing.fps = 60.0;
-      g_timing.sample_rate = 48000;
-   }
 
 }
 

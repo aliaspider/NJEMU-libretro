@@ -52,7 +52,6 @@ static UINT8 ALIGN_DATA input_flag[MAX_INPUTS];
 static int ALIGN_DATA af_map1[MVS_BUTTON_MAX];
 static int ALIGN_DATA af_map2[MVS_BUTTON_MAX];
 static int ALIGN_DATA af_counter[MVS_BUTTON_MAX];
-static int input_ui_wait;
 static int service_switch;
 
 static UINT32 (*poll_pad)(void);
@@ -220,12 +219,7 @@ static void update_inputport0(void)
 		break;
 	}
 
-#ifdef ADHOC
-	if (adhoc_enable)
-		send_data.port_value[0] = value;
-	else
-#endif
-		neogeo_port_value[0] = value;
+	neogeo_port_value[0] = value;
 }
 
 
@@ -280,12 +274,7 @@ static void update_inputport1(void)
 		break;
 	}
 
-#ifdef ADHOC
-	if (adhoc_enable)
-		send_data.port_value[1] = value;
-	else
-#endif
-		neogeo_port_value[1] = value;
+	neogeo_port_value[1] = value;
 }
 
 
@@ -326,12 +315,7 @@ static void update_inputport2(void)
 		break;
 	}
 
-#ifdef ADHOC
-	if (adhoc_enable)
-		send_data.port_value[2] = value;
-	else
-#endif
-		neogeo_port_value[2] = value;
+	neogeo_port_value[2] = value;
 }
 
 
@@ -387,12 +371,7 @@ static void update_inputport4(void)
 		break;
 	}
 
-#ifdef ADHOC
-	if (adhoc_enable)
-		send_data.port_value[4] = value;
-	else
-#endif
-		neogeo_port_value[4] = value;
+	neogeo_port_value[4] = value;
 }
 
 
@@ -409,12 +388,7 @@ static void update_inputport5(void)
 		if (input_flag[TEST_SWITCH] || service_switch) value &= ~0x80;
 	}
 
-#ifdef ADHOC
-	if (adhoc_enable)
-		send_data.port_value[5] = value;
-	else
-#endif
-		neogeo_port_value[5] = value;
+	neogeo_port_value[5] = value;
 }
 
 
@@ -585,7 +559,6 @@ static void popbounc_update_analog_port(UINT16 value)
 
 int input_init(void)
 {
-	input_ui_wait = 0;
 	service_switch = 0;
 
 	memset(neogeo_port_value, 0xff, sizeof(neogeo_port_value));
@@ -599,12 +572,7 @@ int input_init(void)
 
 	if (neogeo_ngh == NGH_irrmaze || neogeo_ngh == NGH_popbounc)
 	{
-#ifdef ADHOC
-		if (adhoc_enable)
-			poll_pad = poll_gamepad;
-		else
-#endif
-			poll_pad = poll_gamepad_analog;
+		poll_pad = poll_gamepad_analog;
 	}
 	else if (!strcmp(game_name, "fatfursp"))
 	{
@@ -615,10 +583,18 @@ int input_init(void)
 		poll_pad = poll_gamepad;
 	}
 
-#ifdef ADHOC
-	if (adhoc_enable)
-		return adhoc_start_thread();
-#endif
+   input_map[P1_UP]=PSP_CTRL_UP;
+	input_map[P1_DOWN]=PSP_CTRL_DOWN;
+	input_map[P1_LEFT]=PSP_CTRL_LEFT;
+	input_map[P1_RIGHT]=PSP_CTRL_RIGHT;
+	input_map[P1_BUTTONA]=PSP_CTRL_CROSS;
+	input_map[P1_BUTTONB]=PSP_CTRL_LTRIGGER;
+	input_map[P1_BUTTONC]=PSP_CTRL_SQUARE;
+	input_map[P1_BUTTOND]=PSP_CTRL_CIRCLE;
+	input_map[P1_AB]=PSP_CTRL_RTRIGGER;
+	input_map[P1_CD]=PSP_CTRL_TRIANGLE;
+	input_map[P1_START]=PSP_CTRL_START;
+	input_map[P1_COIN]=PSP_CTRL_SELECT;
 
 	return 1;
 }
@@ -695,17 +671,6 @@ void update_inputport(void)
    update_inputport2();
    update_inputport4();
    update_inputport5();
-
-   if (input_flag[SWPLAYER])
-   {
-      if (!input_ui_wait)
-      {
-         option_controller ^= 1;
-         input_ui_wait = 30;
-      }
-   }
-
-   if (input_ui_wait > 0) input_ui_wait--;
 
 }
 

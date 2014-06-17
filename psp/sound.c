@@ -22,6 +22,6 @@ void retro_set_audio_sample_batch(retro_audio_sample_batch_t cb) { audio_batch_c
 void render_audio(void)
 {
 	(*sound->update)(sound_buffer);
-   audio_batch_cb(sound_buffer, 400);
-   audio_batch_cb(sound_buffer + 800, 400);
+   audio_batch_cb(sound_buffer, SOUND_BUFFER_SIZE / 4);
+   audio_batch_cb(sound_buffer + SOUND_BUFFER_SIZE / 2, SOUND_BUFFER_SIZE / 4);
 }
