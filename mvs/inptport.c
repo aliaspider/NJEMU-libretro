@@ -625,19 +625,6 @@ int input_init(void)
 
 
 /*------------------------------------------------------
-	ネ□ヲ・ンゥ`・ネ、ホスKチヒ
-------------------------------------------------------*/
-
-void input_shutdown(void)
-{
-#ifdef ADHOC
-	if (adhoc_enable)
-		adhoc_stop_thread();
-#endif
-}
-
-
-/*------------------------------------------------------
 	ネ□ヲ・ンゥ`・ネ、□□サ・テ・ネ
 ------------------------------------------------------*/
 
@@ -650,32 +637,11 @@ void input_reset(void)
 
 	check_input_mode();
 
-	setup_autofire();
-
 	if (neogeo_input_mode)
 		neogeo_port_value[3] = neogeo_dipswitch & 0xff;
 
-#ifdef ADHOC
-	if (adhoc_enable)
-		adhoc_reset_thread();
-#endif
 }
 
-
-/*------------------------------------------------------
-	゜Bノ茹ユ・鬣ー、□Oカィ
-------------------------------------------------------*/
-
-void setup_autofire(void)
-{
-	int i;
-
-	for (i = 0; i < MVS_BUTTON_MAX; i++)
-	{
-		af_map1[i] = input_map[P1_AF_A + i];
-		af_map2[i] = input_map[P1_BUTTONA + i];
-	}
-}
 
 
 /*------------------------------------------------------
@@ -687,146 +653,60 @@ void update_inputport(void)
 	int i;
 	UINT32 buttons;
 
-#ifdef ADHOC
-	if (adhoc_enable)
-	{
-#if !ADHOC_UPDATE_EVERY_FRAME
-		if (adhoc_frame & 1)
-		{
-			adhoc_frame++;
-		}
-		else
-#endif
-		{
-			while (adhoc_update && Loop == LOOP_EXEC)
-			{
-				sceKernelDelayThread(1);
-			}
+   service_switch = 0;
 
-			neogeo_port_value[0] = send_data.port_value[0] & recv_data.port_value[0];
-			neogeo_port_value[1] = send_data.port_value[1] & recv_data.port_value[1];
-			neogeo_port_value[2] = send_data.port_value[2] & recv_data.port_value[2];
-			neogeo_port_value[4] = send_data.port_value[4] & recv_data.port_value[4];
-			neogeo_port_value[5] = send_data.port_value[5] & recv_data.port_value[5];
+   buttons = (*poll_pad)();
 
-			if (Loop == LOOP_EXEC)
-				Loop = recv_data.loop_flag;
+// this code was run after the menu was shown
+// TODO : investigate
+//
+//   if (neogeo_input_mode)
+//      neogeo_port_value[3] = neogeo_dipswitch & 0xff;
+//   else
+//      neogeo_port_value[3] = 0xff;
 
-			if (recv_data.paused)
-				adhoc_paused = recv_data.paused;
+   if ((buttons & PSP_CTRL_LTRIGGER) && (buttons & PSP_CTRL_RTRIGGER))
+   {
+      if (buttons & PSP_CTRL_SELECT)
+      {
+         buttons &= ~(PSP_CTRL_SELECT | PSP_CTRL_LTRIGGER | PSP_CTRL_RTRIGGER);
+         service_switch = 1;
+      }
+   }
 
-			if (adhoc_paused)
-			{
-				adhoc_pause();
-			}
+   if (neogeo_ngh == NGH_irrmaze)
+   {
+      irrmaze_update_analog_port(buttons >> 16);
+      buttons &= 0xffff;
+   }
+   else if (neogeo_ngh == NGH_popbounc)
+   {
+      popbounc_update_analog_port(buttons >> 16);
+      buttons &= 0xffff;
+   }
 
-			service_switch = 0;
+   buttons = update_autofire(buttons);
 
-			buttons = (*poll_pad)();
+   for (i = 0; i < MAX_INPUTS; i++)
+      input_flag[i] = (buttons & input_map[i]) != 0;
 
-			if (readHomeButton())
-			{
-				buttons = 0;
-				adhoc_paused = adhoc_server + 1;
-			}
-			else if ((buttons & PSP_CTRL_LTRIGGER) && (buttons & PSP_CTRL_RTRIGGER))
-			{
-				if (buttons & PSP_CTRL_SELECT)
-				{
-					buttons &= ~(PSP_CTRL_SELECT | PSP_CTRL_LTRIGGER | PSP_CTRL_RTRIGGER);
-					service_switch = 1;
-				}
-			}
+   update_inputport0();
+   update_inputport1();
+   update_inputport2();
+   update_inputport4();
+   update_inputport5();
 
-			buttons = update_autofire(buttons);
+   if (input_flag[SWPLAYER])
+   {
+      if (!input_ui_wait)
+      {
+         option_controller ^= 1;
+         input_ui_wait = 30;
+      }
+   }
 
-			for (i = 0; i < MAX_INPUTS; i++)
-				input_flag[i] = (buttons & input_map[i]) != 0;
+   if (input_ui_wait > 0) input_ui_wait--;
 
-			update_inputport0();
-			update_inputport1();
-			update_inputport2();
-			update_inputport4();
-			update_inputport5();
-
-			send_data.buttons   = buttons;
-			send_data.paused    = adhoc_paused;
-			send_data.loop_flag = Loop;
-			send_data.frame     = adhoc_frame++;
-
-			sceKernelDelayThread(100);
-
-			adhoc_update = 1;
-		}
-	}
-	else
-#endif
-	{
-		service_switch = 0;
-
-		buttons = (*poll_pad)();
-
-		if (readHomeButton())
-		{
-			showmenu();
-			setup_autofire();
-
-			if (neogeo_input_mode)
-				neogeo_port_value[3] = neogeo_dipswitch & 0xff;
-			else
-				neogeo_port_value[3] = 0xff;
-
-			buttons = (*poll_pad)();
-		}
-		else if ((buttons & PSP_CTRL_LTRIGGER) && (buttons & PSP_CTRL_RTRIGGER))
-		{
-			if (buttons & PSP_CTRL_SELECT)
-			{
-				buttons &= ~(PSP_CTRL_SELECT | PSP_CTRL_LTRIGGER | PSP_CTRL_RTRIGGER);
-				service_switch = 1;
-			}
-		}
-
-		if (neogeo_ngh == NGH_irrmaze)
-		{
-			irrmaze_update_analog_port(buttons >> 16);
-			buttons &= 0xffff;
-		}
-		else if (neogeo_ngh == NGH_popbounc)
-		{
-			popbounc_update_analog_port(buttons >> 16);
-			buttons &= 0xffff;
-		}
-
-		buttons = update_autofire(buttons);
-
-		for (i = 0; i < MAX_INPUTS; i++)
-			input_flag[i] = (buttons & input_map[i]) != 0;
-
-		update_inputport0();
-		update_inputport1();
-		update_inputport2();
-		update_inputport4();
-		update_inputport5();
-
-		if (input_flag[SWPLAYER])
-		{
-			if (!input_ui_wait)
-			{
-				option_controller ^= 1;
-				ui_popup(TEXT(CONTROLLER_PLAYERx), option_controller + 1);
-				input_ui_wait = 30;
-			}
-		}	
-		
-		if (input_flag[COMMANDLIST])
-		{
-			commandlist(1);
-			buttons = poll_gamepad();
-		}
-		
-		if (input_ui_wait > 0) input_ui_wait--;
-	}
 }
 
 

@@ -85,9 +85,7 @@ extern int input_analog_value[2];
 void check_input_mode(void);
 
 int input_init(void);
-void input_shutdown(void);
 void input_reset(void);
-void setup_autofire(void);
 void update_inputport(void);
 
 #ifdef SAVE_STATE

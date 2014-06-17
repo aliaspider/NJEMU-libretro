@@ -141,7 +141,7 @@ static void bios_error(const char *rom_name, int error, int flag)
 	if (flag)
 		fatalerror(mes);
 	else
-		ui_popup(mes);
+		msg_printf(mes);
 }
 
 
@@ -154,18 +154,8 @@ static int bios_check(int flag)
 	int i, err, count = 0, check_max = DEBUG_BIOS;
 	char *fname;
 
-	if (!flag) ui_popup_reset();
-
 	for (i = 0; i < BIOS_MAX; i++)
 		bios_exist[i] = 0;
-
-#ifdef ADHOC
-	if (flag == 2)
-	{
-		neogeo_bios = -1;
-		check_max = JAPAN_AES;		//MAX BIOS
-	}
-#endif
 
 	for (i = 0; i <= check_max; i++)
 	{
@@ -180,7 +170,7 @@ static int bios_check(int flag)
 	if (count == 0)
 	{
 		if (!flag)
-			ui_popup(TEXT(BIOS_NOT_FOUND));
+			msg_printf(TEXT(BIOS_NOT_FOUND));
 		else
 			fatalerror(TEXT(BIOS_NOT_FOUND));
 		return 0;
@@ -222,157 +212,26 @@ static int bios_check(int flag)
 
 void bios_select(int flag)
 {
-	int sel = 0, rows = 13, top = 0;
-	int i, prev_sel, update = 1;
+   // autoselects the first available bios
+   // TODO : add core option for this
 	int old_bios = neogeo_bios;
 
 	if (!bios_check(flag)) return;
 
 	if (neogeo_bios == -1)
 	{
-		sel = 0;
-		while (sel < BIOS_MAX)
+		neogeo_bios = 0;
+		while (neogeo_bios < BIOS_MAX)
 		{
-			if (bios_exist[sel]) break;
-			sel++;
+			if (bios_exist[neogeo_bios]) break;
+			neogeo_bios++;
 		}
 	}
-	else sel = neogeo_bios;
 
-	if (top > BIOS_MAX - rows) top = BIOS_MAX - rows;
-	if (top < 0) top = 0;
-	if (sel >= BIOS_MAX) sel = 0;
-	if (sel < 0) sel = BIOS_MAX - 1;
-	if (sel >= top + rows) top = sel - rows + 1;
-	if (sel < top) top = sel;
+   if (old_bios != neogeo_bios)
+   {
+      if (!flag) msg_printf(TEXT(ALL_NVRAM_FILES_ARE_REMOVED));
+      delete_files("nvram", ".nv");
+   }
 
-	pad_wait_clear();
-	load_background(BG_DEFAULT);
-	ui_popup_reset();
-
-	do
-	{
-		if (update)
-		{
-			show_background();
-
-			small_icon(8, 3, UI_COLOR(UI_PAL_TITLE), ICON_SYSTEM);
-			uifont_print(36, 5, UI_COLOR(UI_PAL_TITLE), TEXT(BIOS_SELECT_MENU));
-
-			if (top != 0)
-				uifont_print(118, 24, UI_COLOR(UI_PAL_SELECT), FONT_UPTRIANGLE);
-
-			for (i = 0; i < rows; i++)
-			{
-				if (top + i >= BIOS_MAX) break;
-
-				if (top + i == sel)
-				{
-					uifont_print(12, 40 + i * 17, UI_COLOR(UI_PAL_SELECT), FONT_RIGHTTRIANGLE);
-					uifont_print(32, 40 + i * 17, UI_COLOR(UI_PAL_SELECT), bios_name[top + i]);
-				}
-				else
-				{
-					if (bios_exist[top + i])
-						uifont_print(32, 40 + i * 17, UI_COLOR(UI_PAL_NORMAL), bios_name[top + i]);
-					else
-						uifont_print(32, 40 + i * 17, COLOR_DARKGRAY, bios_name[top + i]);
-				}
-			}
-
-			if (flag != 2 && top + rows < BIOS_MAX)
-				uifont_print(118, 260, UI_COLOR(UI_PAL_SELECT), FONT_DOWNTRIANGLE);
-			if (flag == 2 && sel > 12)
-				uifont_print(118, 260, UI_COLOR(UI_PAL_SELECT), FONT_DOWNTRIANGLE);
-
-			update  = draw_battery_status(1);
-			update |= draw_volume_status(1);
-			update |= ui_show_popup(1);
-		}
-		else
-		{
-			update  = draw_battery_status(0);
-			update |= draw_volume_status(0);
-			update |= ui_show_popup(0);
-			video_wait_vsync();
-		}
-
-		prev_sel = sel;
-
-		if (pad_pressed(PSP_CTRL_UP))
-		{
-			if (sel > 0)
-			{
-				if (bios_exist[sel - 1])
-				{
-					sel--;
-				}
-				else
-				{
-					for (i = sel - 2; i >= 0; i--)
-						if (bios_exist[i]) break;
-
-					if (i != -1) sel = i;
-				}
-			}
-		}
-		else if (pad_pressed(PSP_CTRL_DOWN))
-		{
-			if (sel < BIOS_MAX - 1)
-			{
-				if (bios_exist[sel + 1])
-				{
-					sel++;
-				}
-				else
-				{
-					for (i = sel + 2; i < BIOS_MAX; i++)
-						if (bios_exist[i]) break;
-
-					if (i != BIOS_MAX) sel = i;
-				}
-			}
-		}
-		else if (pad_pressed(PSP_CTRL_CIRCLE))
-		{
-			neogeo_bios = sel;
-			break;
-		}
-		else if (pad_pressed(PSP_CTRL_SELECT))
-		{
-			help(HELP_SELECTBIOS);
-			update = 1;
-		}
-
-		if (top > BIOS_MAX - rows) top = BIOS_MAX - rows;
-		if (top < 0) top = 0;
-		if (sel >= BIOS_MAX) sel = 0;
-		if (sel < 0) sel = BIOS_MAX - 1;
-		if (sel >= top + rows) top = sel - rows + 1;
-		if (sel < top) top = sel;
-
-		if (prev_sel != sel) update = 1;
-
-		pad_update();
-
-		if (Loop == LOOP_EXIT) break;
-	} while (!pad_pressed(PSP_CTRL_LTRIGGER) && !pad_pressed(PSP_CTRL_CROSS));
-
-	pad_wait_clear();
-	ui_popup_reset();
-	if (flag)
-		load_background(WP_LOGO);
-	else
-		load_background(WP_FILER);
-
-#ifdef ADHOC
-	if (flag != 2)
-#endif
-	{
-		if (old_bios != neogeo_bios)
-		{
-			if (!flag) ui_popup(TEXT(ALL_NVRAM_FILES_ARE_REMOVED));
-			delete_files("nvram", ".nv");
-		}
-	}
 }

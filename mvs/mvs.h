@@ -28,6 +28,7 @@ extern int neogeo_bios;
 extern int neogeo_region;
 extern int neogeo_save_sound_flag;
 
-void neogeo_main(void);
-
+int neogeo_main(void);
+void neogeo_exit(void);
+void neogeo_reset(void);
 #endif /* MVS_H */

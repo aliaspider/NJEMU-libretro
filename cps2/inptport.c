@@ -757,7 +757,6 @@ STATE_LOAD( input )
 	state_load_long(&input_analog_value[0], 1);
 	state_load_long(&input_analog_value[1], 1);
 
-	setup_autofire();
 	input_ui_wait = 0;
 	p12_start_pressed = 0;
 	service_switch = 0;

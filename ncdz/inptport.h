@@ -67,9 +67,7 @@ extern int analog_sensitivity;
 extern UINT8 neogeo_port_value[NCDZ_PORT_MAX];
 
 int input_init(void);
-void input_shutdown(void);
 void input_reset(void);
-void setup_autofire(void);
 void update_inputport(void);
 
 #ifdef SAVE_STATE

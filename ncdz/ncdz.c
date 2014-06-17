@@ -298,7 +298,6 @@ void neogeo_main(void)
 						}
 						neogeo_exit();
 					}
-					input_shutdown();
 					cdrom_shutdown();
 				}
 				cdda_shutdown();

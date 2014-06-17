@@ -513,7 +513,6 @@ INLINE void set_main_cpu_vector_table_source(UINT8 data)
 	display_position_interrupt_counter = 0;
 	blit_set_fix_clear_flag();
 	blit_set_spr_clear_flag();
-	autoframeskip_reset();
 
 	// hack for PSP
 	if (data)

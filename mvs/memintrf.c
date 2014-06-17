@@ -1600,21 +1600,9 @@ int memory_init(void)
 	psp2k_mem_left   = PSP2K_MEM_SIZE;
 #endif
 
-#ifdef ADHOC
-	if (adhoc_enable)
-	{
-		bios_select(2);
-
-		if (neogeo_bios == -1)
-			return 0;
-	}
-#endif
-
 	cache_init();
 	pad_wait_clear();
-	msg_screen_init(WP_LOGO, ICON_SYSTEM, TEXT(LOAD_ROM));
 
-	load_gamecfg(game_name);
 
 	memset(neogeo_memcard, 0, 0x800);
 	memset(neogeo_ram, 0, 0x10000);
@@ -1638,7 +1626,6 @@ int memory_init(void)
 		}
 
 		pad_wait_clear();
-		msg_screen_init(WP_LOGO, ICON_SYSTEM, TEXT(LOAD_ROM));
 		msg_printf(TEXT(CHECKING_BIOS));
 		msg_printf(TEXT(ALL_NVRAM_FILES_ARE_REMOVED));
 	}

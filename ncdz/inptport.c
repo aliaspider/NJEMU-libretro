@@ -204,13 +204,6 @@ int input_init(void)
 }
 
 
-/*------------------------------------------------------
-	ネ□ヲ・ンゥ`・ネ、ホスKチヒ
-------------------------------------------------------*/
-
-void input_shutdown(void)
-{
-}
 
 
 /*------------------------------------------------------
@@ -221,23 +214,6 @@ void input_reset(void)
 {
 	memset(neogeo_port_value, 0xff, sizeof(neogeo_port_value));
 	neogeo_port_value[2] = 0x0f;
-	setup_autofire();
-}
-
-
-/*------------------------------------------------------
-	゜Bノ茹ユ・鬣ー、□Oカィ
-------------------------------------------------------*/
-
-void setup_autofire(void)
-{
-	int i;
-
-	for (i = 0; i < NCDZ_BUTTON_MAX; i++)
-	{
-		af_map1[i] = input_map[P1_AF_A + i];
-		af_map2[i] = input_map[P1_BUTTONA + i];
-	}
 }
 
 
@@ -255,7 +231,6 @@ void update_inputport(void)
 	if (readHomeButton())
 	{
 		showmenu();
-		setup_autofire();
 		buttons = poll_gamepad();
 	}
 /*

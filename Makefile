@@ -1,4 +1,4 @@
-SYSTEM   = cps1
+SYSTEM   = mvs
 PSP      = slim
 DEBUG    = 0
 
@@ -33,9 +33,11 @@ OBJS    += cpu/m68000/m68000.o cpu/m68000/c68k.o cpu/z80/z80.o cpu/z80/cz80.o co
 
 ## MVS ##
 else ifeq ($(SYSTEM), mvs)
-DEFINES += -BUILD_MVSPSP=1
+DEFINES += -DBUILD_MVSPSP=1
 INCDIRS := -Imvs
-OBJS    := cps2/cps2.o cps2/cps2crpt.o cps2/driver.o cps2/memintrf.o cps2/inptport.o cps2/timer.o cps2/vidhrdw.o cps2/sprite.o cps2/eeprom.o sound/qsound.o
+OBJS    := mvs/mvs.o mvs/driver.o mvs/memintrf.o mvs/inptport.o mvs/dipsw.o mvs/timer.o
+OBJS    += mvs/vidhrdw.o mvs/sprite.o mvs/pd4990a.o mvs/neocrypt.o mvs/biosmenu.o sound/2610intf.o sound/ym2610.o
+OBJS    += cpu/m68000/m68000.o cpu/m68000/c68k.o cpu/z80/z80.o cpu/z80/cz80.o
 
 ## NCDZ ##
 else

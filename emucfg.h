@@ -107,6 +107,8 @@
 
 #define APPNAME_STR				"NEOGEO Emulator for PSP"
 #define machine_main			neogeo_main
+#define machine_reset		neogeo_reset
+#define machine_exit			neogeo_exit
 
 #define EMU_SYSTEM				MVS
 #define SYSTEM_NAME				"NEO。、GEO"

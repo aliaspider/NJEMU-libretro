@@ -9,13 +9,7 @@
 #include "mvs.h"
 
 #define MENU_BLANK		{ "\n", 0, 0x00, 0, 0, { NULL } }
-#if DIPSW_CHINESE_SIMPLIFIED
-#define MENU_RETURN		{ "キオサリヨ□ヒオ・", 1, 0x00, 0, 0, { NULL } }
-#elif DIPSW_CHINESE_TRADITIONAL
-#define MENU_RETURN		{ "キオサリヨ□ヒ□", 1, 0x00, 0, 0, { NULL } }
-#else
 #define MENU_RETURN		{ "Return to main menu", 1, 0x00, 0, 0, { NULL } }
-#endif
 #define MENU_END		{ "\0", 0, 0x00, 0, 0, { NULL } }
 
 
@@ -36,29 +30,14 @@ int neogeo_hard_dipsw;
 
 static dipswitch_t dipswitch_default[] =
 {
-#if DIPSW_CHINESE_SIMPLIFIED
-	{ "イ簗ヤソェケリ",					1, 0x01, 0, 1, { "ケリ","ソェ" } },
-	{ "ヘカアメイロ",						1, 0x02, 0, 1, { "1", "2" } },
-	{ "ラヤカッチャキ「(イソキヨモホマキ)",			1, 0x04, 0, 1, { "ケリ","ソェ" } },
-	{ "チェサ揵靹テ",					1, 0x38, 0, 4, { "ケリ","1","2","3","4" } },
-	{ "テ箙ムモホヘ□,					1, 0x40, 0, 1, { "ケリ","ソェ" } },
-	{ "ヒ□ィ",						1, 0x80, 0, 1, { "ケリ","ソェ" } },
-#elif DIPSW_CHINESE_TRADITIONAL
-	{ "忱ヤ□_鷄",					1, 0x01, 0, 1, { "鷄","饑" } },
-	{ "ヘカ芝イロ",						1, 0x02, 0, 1, { "1", "2" } },
-	{ "ラヤ□゜Bーl(イソキヨ゜[沢)",			1, 0x04, 0, 1, { "鷄","饑" } },
-	{ "ツ等CヤOヨテ",					1, 0x38, 0, 4, { "鷄","1","2","3","4" } },
-	{ "テ籐M゜[ヘ□,					1, 0x40, 0, 1, { "鷄","饑" } },
-	{ "詈カィ",						1, 0x80, 0, 1, { "鷄","饑" } },
-#else
 	{ "Test Switch",				1, 0x01, 0, 1, { "Off","On" } },
 	{ "Coin Chutes",				1, 0x02, 0, 1, { "1", "2" } },
 	{ "Autofire (in some games)",	1, 0x04, 0, 1, { "Off","On" } },
 	{ "COMM Settings",				1, 0x38, 0, 4, { "Off","1","2","3","4" } },
 	{ "Free Play",					1, 0x40, 0, 1, { "Off","On" } },
 	{ "Freeze",						1, 0x80, 0, 1, { "Off","On" } },
-#endif
-	MENU_BLANK,
+
+   MENU_BLANK,
 	MENU_RETURN,
 	MENU_END,
 };
@@ -69,23 +48,6 @@ static dipswitch_t dipswitch_default[] =
 
 static dipswitch_t dipswitch_pcb[] =
 {
-#if DIPSW_CHINESE_SIMPLIFIED
-	{ "イ簗ヤソェケリ",					1, 0x01, 0, 1, { "ケリ","ソェ" } },
-	{ "ヘカアメイロ",						1, 0x02, 0, 1, { "1", "2" } },
-	{ "ラヤカッチャキ「(イソキヨモホマキ)",			1, 0x04, 0, 1, { "ケリ","ソェ" } },
-	{ "チェサ揵靹テ",					1, 0x38, 0, 4, { "ケリ","1","2","3","4" } },
-	{ "テ箙ムモホヘ□,					1, 0x40, 0, 1, { "ケリ","ソェ" } },
-	{ "ヒ□ィ",						1, 0x80, 0, 1, { "ケリ","ソェ" } },
-	{ "モイシ□ip 3(ヌ□□",			1, 0x01, 0, 1, { "ムヌー□,"ネユー□ } },
-#elif DIPSW_CHINESE_TRADITIONAL
-	{ "忱ヤ□_鷄",					1, 0x01, 0, 1, { "鷄","饑" } },
-	{ "ヘカ芝イロ",						1, 0x02, 0, 1, { "1", "2" } },
-	{ "ラヤ□゜Bーl(イソキヨ゜[沢)",			1, 0x04, 0, 1, { "鷄","饑" } },
-	{ "ツ等CヤOヨテ",					1, 0x38, 0, 4, { "鷄","1","2","3","4" } },
-	{ "テ籐M゜[ヘ□,					1, 0x40, 0, 1, { "鷄","饑" } },
-	{ "詈カィ",						1, 0x80, 0, 1, { "鷄","饑" } },
-	{ "モイシ□ip 3(□モ□",			1, 0x01, 0, 1, { "≧ー□,"ネユー□ } },
-#else
 	{ "Test Switch",				1, 0x01, 0, 1, { "Off","On" } },
 	{ "Coin Chutes",				1, 0x02, 0, 1, { "1", "2" } },
 	{ "Autofire (in some games)",	1, 0x04, 0, 1, { "Off","On" } },
@@ -93,8 +55,8 @@ static dipswitch_t dipswitch_pcb[] =
 	{ "Free Play",					1, 0x40, 0, 1, { "Off","On" } },
 	{ "Freeze",						1, 0x80, 0, 1, { "Off","On" } },
 	{ "Hard Dip 3 (Region)",		1, 0x01, 0, 1, { "Asia","Japan" } },
-#endif
-	MENU_BLANK,
+
+   MENU_BLANK,
 	MENU_RETURN,
 	MENU_END,
 };
@@ -105,29 +67,14 @@ static dipswitch_t dipswitch_pcb[] =
 
 static dipswitch_t dipswitch_mjneogeo[] =
 {
-#if DIPSW_CHINESE_SIMPLIFIED
-	{ "イ簗ヤソェケリ",					1, 0x01, 0, 1, { "ケリ","ソェ" } },
-	{ "ヘカアメイロ",						1, 0x02, 0, 1, { "1", "2" } },
-	{ "ツ鮨ォイルラ□□,					1, 0x04, 0, 1, { "ケリ","ソェ" } },
-	{ "チェサ揵靹テ",					1, 0x38, 0, 4, { "ケリ","1","2","3","4" } },
-	{ "テ箙ムモホヘ□,					1, 0x40, 0, 1, { "ケリ","ソェ" } },
-	{ "ヒ□ィ",						1, 0x80, 0, 1, { "ケリ","ソェ" } },
-#elif DIPSW_CHINESE_TRADITIONAL
-	{ "忱ヤ□_鷄",					1, 0x01, 0, 1, { "鷄","饑" } },
-	{ "ヘカ芝イロ",						1, 0x02, 0, 1, { "1", "2" } },
-	{ "ツ骭「イルラ□□,					1, 0x04, 0, 1, { "鷄","饑" } },
-	{ "ツ等CヤOヨテ",					1, 0x38, 0, 4, { "鷄","1","2","3","4" } },
-	{ "テ籐M゜[ヘ□,					1, 0x40, 0, 1, { "鷄","饑" } },
-	{ "詈カィ",						1, 0x80, 0, 1, { "鷄","饑" } },
-#else
-	{ "Test Switch",				1, 0x01, 0, 1, { "Off","On" } },
+   { "Test Switch",				1, 0x01, 0, 1, { "Off","On" } },
 	{ "Coin Chutes",				1, 0x02, 0, 1, { "1", "2" } },
 	{ "Mahjong Control Panel",		0, 0x04, 0, 1, { "Off","On" } },
 	{ "COMM Settings",				1, 0x38, 0, 4, { "Off","1","2","3","4" } },
 	{ "Free Play",					1, 0x40, 0, 1, { "Off","On" } },
 	{ "Freeze",						1, 0x80, 0, 1, { "Off","On" } },
-#endif
-	MENU_BLANK,
+
+   MENU_BLANK,
 	MENU_RETURN,
 	MENU_END,
 };
@@ -140,23 +87,6 @@ static dipswitch_t dipswitch_mjneogeo[] =
 #if !RELEASE
 static dipswitch_t dipswitch_kog[] =
 {
-#if DIPSW_CHINESE_SIMPLIFIED
-	{ "イ簗ヤソェケリ",					1, 0x01, 0, 1, { "ケリ","ソェ" } },
-	{ "ヘカアメイロ",						1, 0x02, 0, 1, { "1", "2" } },
-	{ "ラヤカッチャキ「(イソキヨモホマキ)",			1, 0x04, 0, 1, { "ケリ","ソェ" } },
-	{ "チェサ揵靹テ",					1, 0x38, 0, 4, { "ケリ","1","2","3","4" } },
-	{ "テ箙ムモホヘ□,					1, 0x40, 0, 1, { "ケリ","ソェ" } },
-	{ "ヒ□ィ",						1, 0x80, 0, 1, { "ケリ","ソェ" } },
-	{ "ア□簽□ヤ",					1, 0x01, 0, 1, { "ヨミホト","モ「ホト" } },
-#elif DIPSW_CHINESE_TRADITIONAL
-	{ "忱ヤ□_鷄",					1, 0x01, 0, 1, { "鷄","饑" } },
-	{ "ヘカ芝イロ",						1, 0x02, 0, 1, { "1", "2" } },
-	{ "ラヤ□゜Bーl(イソキヨ゜[沢)",			1, 0x04, 0, 1, { "鷄","饑" } },
-	{ "ツ等CヤOヨテ",					1, 0x38, 0, 4, { "鷄","1","2","3","4" } },
-	{ "テ籐M゜[ヘ□,					1, 0x40, 0, 1, { "鷄","饑" } },
-	{ "詈カィ",						1, 0x80, 0, 1, { "鷄","饑" } },
-	{ "侏□ユZムヤ",					1, 0x01, 0, 1, { "ヨミホト","モ「ホト" } },
-#else
 	{ "Test Switch",				1, 0x01, 0, 1, { "Off","On" } },
 	{ "Coin Chutes",				1, 0x02, 0, 1, { "1", "2" } },
 	{ "Autofire (in some games)",	1, 0x04, 0, 1, { "Off","On" } },
@@ -164,8 +94,8 @@ static dipswitch_t dipswitch_kog[] =
 	{ "Free Play",					1, 0x40, 0, 1, { "Off","On" } },
 	{ "Freeze",						1, 0x80, 0, 1, { "Off","On" } },
 	{ "Title Language",				1, 0x01, 0, 1, { "Chinese","English" } },
-#endif
-	MENU_BLANK,
+
+   MENU_BLANK,
 	MENU_RETURN,
 	MENU_END,
 };

@@ -111,7 +111,38 @@ char *find_file(char *pattern, char *path)
 }
 
 
+void delete_files(const char *dirname, const char *pattern)
+{
+	int fd, i, len1, len2;
+	char path[MAX_PATH];
 
+	memset(&dir, 0, sizeof(dir));
+
+	sprintf(path, "%s%s", launchDir, dirname);
+
+	fd = sceIoDopen(path);
+	len1 = strlen(pattern);
+
+	while (1)
+	{
+		if (sceIoDread(fd, &dir) <= 0) break;
+
+		len2 = strlen(dir.d_name);
+
+		for (i = 0; i < len2; i++)
+		{
+			if (strnicmp(&dir.d_name[i], pattern, len1) == 0)
+			{
+				char path2[MAX_PATH];
+
+				sprintf(path2, "%s/%s", path, dir.d_name);
+				sceIoRemove(path2);
+			}
+		}
+	}
+
+	sceIoDclose(fd);
+}
 
 #ifdef SAVE_STATE
 
