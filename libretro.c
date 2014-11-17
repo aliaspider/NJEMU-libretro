@@ -18,6 +18,12 @@ static retro_input_poll_t input_poll_cb;
 static retro_input_state_t input_state_cb;
 static retro_environment_t environ_cb;
 
+#define NJEMU_DISPLAY_LIST_ID   0x1300
+static PspGeContext main_context_buffer;
+static PspGeContext njemu_context_buffer;
+//static int main_context_state;
+//static int njemu_context_state;
+
 void retro_get_system_info(struct retro_system_info *info)
 {
    info->library_name = "NJEMU-" SYSTEM_NAME;
@@ -52,7 +58,6 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
 
 void retro_init()
 {
-
    getcwd(launchDir, MAX_PATH - 1);
    strcat(launchDir, "/");
 
@@ -64,6 +69,9 @@ void retro_init()
    pad_init();
    video_init();
 
+   sceGuSync(0,0);
+//   njemu_context_state = sceGuGetAllStatus();
+   sceGeSaveContext(&njemu_context_buffer);
 
    struct retro_log_callback log;
 
@@ -145,7 +153,14 @@ bool retro_load_game(const struct retro_game_info *info)
    if (temp_p)
       *temp_p = '\0';
 
+   sceGeSaveContext(&main_context_buffer);
+   sceGeRestoreContext(&njemu_context_buffer);
+
    return machine_main();
+
+   sceGuSync(0,0);
+   sceGeSaveContext(&njemu_context_buffer);
+   sceGeRestoreContext(&main_context_buffer);
 }
 
 
@@ -171,13 +186,35 @@ size_t retro_get_memory_size(unsigned id)
    return 0;
 }
 
+
+static inline void list_finish_callback(int id)
+{
+   if (id != NJEMU_DISPLAY_LIST_ID)
+      return;
+
+   sceGeSaveContext(&njemu_context_buffer);
+   sceGeRestoreContext(&main_context_buffer);
+
+}
+
 void retro_run()
 {
+   static unsigned int __attribute__((aligned(64))) d_list[1024];
+   u16* texture_vram_p = (void*) ((u32)work_frame|0x44000000);
+//   u16* texture_vram_p = (void*) ((u32)draw_frame|0x44000000);
 
-
-   static unsigned int __attribute__((aligned(16))) d_list[32];
-   u16* texture_vram_p = (void*) ((u32)work_frame|0x04000000);
    input_poll_cb();
+
+
+
+   sceGuSync(0,0);
+
+//   main_context_state = sceGuGetAllStatus();
+   sceGeSaveContext(&main_context_buffer);
+
+//   sceGuSetAllStatus(njemu_context_state);
+//   sceGeRestoreContext(&njemu_context_buffer);
+   sceGuSetCallback(GU_CALLBACK_FINISH, list_finish_callback);
 
    sceGuStart(GU_DIRECT, gulist);
    sceGuEnable(GU_SCISSOR_TEST);
@@ -190,6 +227,12 @@ void retro_run()
    sceGuDepthRange(65535, 0);
    sceGuDepthFunc(GU_GEQUAL);
    sceGuDepthMask(GU_TRUE);
+   sceGuClearDepth(0);
+
+//   sceGuEnable(GU_DEPTH_TEST);
+//   sceGuDepthMask(GU_FALSE);
+
+
    sceGuEnable(GU_TEXTURE_2D);
    sceGuTexMode(GU_PSM_5551, 0, 0, GU_FALSE);
    sceGuTexScale(1.0f / BUF_WIDTH, 1.0f / BUF_WIDTH);
@@ -198,37 +241,53 @@ void retro_run()
    sceGuClutMode(GU_PSM_5551, 0, 0xff, 0);
    sceGuFinish();
 
+   sceGuSync(0,0);
 
    timer_update_cpu();
    render_audio();
 	frames_displayed++;
    update_inputport();
 
+   sceGuSync(0,0);
+   static unsigned int __attribute__((aligned(64))) restore_context_d_list[1024];
+   sceGuStart(GU_DIRECT, restore_context_d_list);
+   sceGuFinishId(NJEMU_DISPLAY_LIST_ID);
+
+   sceGuSync(0,0);
    //  might be necessary to check video_enable here and draw a black frame instead
+//   sceGuSync(0,0);
+
+
+//   njemu_context_state= sceGuGetAllStatus();
+//   sceGuSetAllStatus(main_context_state);
+
 
    sceGuStart(GU_DIRECT, d_list);
-   sceGuTexImage(0, 512, 512, BUF_WIDTH, (texture_vram_p + (FRAME_OFFSET_X + FRAME_OFFSET_Y * BUF_WIDTH)) );
+   sceGuEnable(GU_TEXTURE_2D);
    sceGuTexMode(GU_PSM_5551, 0, 0, GU_FALSE);
+   sceGuTexImage(0, 512, 512, BUF_WIDTH, (texture_vram_p + (FRAME_OFFSET_X + FRAME_OFFSET_Y * BUF_WIDTH)) );
+
    sceGuTexFunc(GU_TFX_REPLACE, GU_TCC_RGB);
-   sceGuDisable(GU_BLEND);
+//   sceGuDisable(GU_BLEND);
 
-   sceGuEnable(GU_SCISSOR_TEST);
-   sceGuScissor(0, 0, SCR_WIDTH, 272);
+//   sceGuEnable(GU_SCISSOR_TEST);
+//   sceGuScissor(0, 0, SCR_WIDTH, 272);
 
-
-   sceGuDepthFunc(GU_GEQUAL);
-   sceGuDepthMask(GU_TRUE);
-   sceGuDisable(GU_DEPTH_TEST);
-   sceGuTexScale(1.0f, 1.0f );
-   sceGuTexOffset(0, 0);
+//   sceGuDepthFunc(GU_GEQUAL);
+//   sceGuDepthMask(GU_TRUE);
+//   sceGuDisable(GU_DEPTH_TEST);
+//   sceGuTexScale(1.0f, 1.0f );
+//   sceGuTexOffset(0, 0);
 //   sceGuTexFunc(GU_TFX_REPLACE, GU_TCC_RGBA);
 //   sceGuClutMode(GU_PSM_5551, 0, 0xff, 0);
 
-   sceGuTexFilter(GU_LINEAR,GU_LINEAR);   
+//   sceGuTexFilter(GU_LINEAR,GU_LINEAR);
    sceGuFinish();
 
 
-   video_cb(texture_vram_p, FRAME_WIDTH, FRAME_HEIGHT, BUF_WIDTH);
+//   video_cb(texture_vram_p, FRAME_WIDTH, FRAME_HEIGHT, BUF_WIDTH);
+   video_cb(RETRO_HW_FRAME_BUFFER_VALID, FRAME_WIDTH, FRAME_HEIGHT, BUF_WIDTH);
+//   sceDisplaySetFrameBuf(texture_vram_p, 512, PSP_DISPLAY_PIXEL_FORMAT_5551, PSP_DISPLAY_SETBUF_NEXTFRAME );
 
 }
 
