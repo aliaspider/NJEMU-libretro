@@ -47,11 +47,6 @@ extern int use_parent_crom;
 extern int use_parent_srom;
 extern int use_parent_vrom;
 
-#ifdef PSP_SLIM
-extern UINT32 psp2k_mem_offset;
-extern INT32 psp2k_mem_left;
-#endif
-
 int memory_init(void);
 void memory_shutdown(void);
 

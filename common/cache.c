@@ -716,40 +716,28 @@ int cache_start(void)
 
 		// エ_ア」ソノトワ、ハ・オ・、・コ、□チ・ァ・テ・ッ
 
-#ifdef PSP_SLIM
-		if (psp2k_mem_left == PSP2K_MEM_SIZE)//ui32 bug
-		{
-			GFX_MEMORY = (UINT8 *)PSP2K_MEM_TOP;
-			i = MAX_CACHE_SIZE;
-			size = i << BLOCK_SHIFT;
-		}
-		else
-#endif
+      for (i = GFX_SIZE >> BLOCK_SHIFT; i >= MIN_CACHE_SIZE; i--)
+      {
+         if ((GFX_MEMORY = (UINT8 *)memalign(MEM_ALIGN, (i << BLOCK_SHIFT) + CACHE_SAFETY)) != NULL)
+         {
+            size = i << BLOCK_SHIFT;
+            free(GFX_MEMORY);
+            GFX_MEMORY = NULL;
+            break;
+         }
+      }
 
-		{
-			for (i = GFX_SIZE >> BLOCK_SHIFT; i >= MIN_CACHE_SIZE; i--)
-			{
-				if ((GFX_MEMORY = (UINT8 *)memalign(MEM_ALIGN, (i << BLOCK_SHIFT) + CACHE_SAFETY)) != NULL)
-				{
-					size = i << BLOCK_SHIFT;
-					free(GFX_MEMORY);
-					GFX_MEMORY = NULL;
-					break;
-				}
-			}
+      if (i < MIN_CACHE_SIZE)
+      {
+         msg_printf(TEXT(MEMORY_NOT_ENOUGH));
+         return 0;
+      }
 
-			if (i < MIN_CACHE_SIZE)
-			{
-				msg_printf(TEXT(MEMORY_NOT_ENOUGH));
-				return 0;
-			}
-
-			if ((GFX_MEMORY = (UINT8 *)memalign(MEM_ALIGN, size)) == NULL)
-			{
-				msg_printf(TEXT(COULD_NOT_ALLOCATE_CACHE_MEMORY));
-				return 0;
-			}
-		}
+      if ((GFX_MEMORY = (UINT8 *)memalign(MEM_ALIGN, size)) == NULL)
+      {
+         msg_printf(TEXT(COULD_NOT_ALLOCATE_CACHE_MEMORY));
+         return 0;
+      }
 
 		memset(GFX_MEMORY, 0, size);
 
@@ -893,38 +881,20 @@ void cache_sleep(int flag)
 	・ケ・ニゥ`・ネ・サゥ`・ヨ□モ□□サ瓶オト、ヒエ_ア」、ケ、□
 ------------------------------------------------------*/
 
-#ifdef PSP_SLIM
-static int cache_alloc_type = 0;
-#endif
-
 UINT8 *cache_alloc_state_buffer(INT32 size)
 {
-#ifdef PSP_SLIM
-	if (size < psp2k_mem_left)
-	{
-		cache_alloc_type = 1;
-		return (UINT8 *)psp2k_mem_offset;
-	}
-	else
-#endif
-	{
-		SceUID fd;
-		char path[MAX_PATH];
+   SceUID fd;
+   char path[MAX_PATH];
 
-#ifdef PSP_SLIM
-		cache_alloc_type = 0;
-#endif
+   sprintf(path, "%sstate/cache.tmp", launchDir);
 
-		sprintf(path, "%sstate/cache.tmp", launchDir);
-
-		if ((fd = sceIoOpen(path, PSP_O_WRONLY|PSP_O_CREAT, 0777)) >= 0)
-		{
-			sceIoWrite(fd, GFX_MEMORY, size);
-			sceIoClose(fd);
-			return GFX_MEMORY;
-		}
-		return NULL;
-	}
+   if ((fd = sceIoOpen(path, PSP_O_WRONLY|PSP_O_CREAT, 0777)) >= 0)
+   {
+      sceIoWrite(fd, GFX_MEMORY, size);
+      sceIoClose(fd);
+      return GFX_MEMORY;
+   }
+   return NULL;
 }
 
 /*------------------------------------------------------
@@ -933,26 +903,17 @@ UINT8 *cache_alloc_state_buffer(INT32 size)
 
 void cache_free_state_buffer(INT32 size)
 {
-#ifdef PSP_SLIM
-	if (!cache_alloc_type)
-#endif
-	{
-		SceUID fd;
-		char path[MAX_PATH];
+   SceUID fd;
+   char path[MAX_PATH];
 
-		sprintf(path, "%sstate/cache.tmp", launchDir);
+   sprintf(path, "%sstate/cache.tmp", launchDir);
 
-		if ((fd = sceIoOpen(path, PSP_O_RDONLY, 0777)) >= 0)
-		{
-			sceIoRead(fd, GFX_MEMORY, size);
-			sceIoClose(fd);
-		}
-		sceIoRemove(path);
-	}
-
-#ifdef PSP_SLIM
-	cache_alloc_type = 0;
-#endif
+   if ((fd = sceIoOpen(path, PSP_O_RDONLY, 0777)) >= 0)
+   {
+      sceIoRead(fd, GFX_MEMORY, size);
+      sceIoClose(fd);
+   }
+   sceIoRemove(path);
 }
 
 #endif /* STATE_SAVE */

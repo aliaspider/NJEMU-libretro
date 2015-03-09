@@ -110,11 +110,6 @@ int use_parent_crom;
 int use_parent_srom;
 int use_parent_vrom;
 
-#ifdef PSP_SLIM
-UINT32 psp2k_mem_offset = PSP2K_MEM_TOP;
-INT32 psp2k_mem_left = PSP2K_MEM_SIZE;
-#endif
-
 
 /******************************************************************************
 	・□`・ォ・□欽□□我ハ□
@@ -451,68 +446,6 @@ static int build_zoom_tables(void)
 
 
 /******************************************************************************
-	PSP-2000モテ・皈筵□ワタ□
-******************************************************************************/
-
-#ifdef PSP_SLIM
-
-#define MEMORY_IS_PSP2K(mem)	((UINT32)mem >= PSP2K_MEM_TOP)
-
-/*--------------------------------------------------------
-	宙処、オ、□ソ□モ□ォ、鬣皈筵熙□_ア」
---------------------------------------------------------*/
-
-static void *psp2k_mem_alloc(INT32 size)
-{
-	UINT8 *mem = NULL;
-
-	if (size <= psp2k_mem_left)
-	{
-		mem = (UINT8 *)psp2k_mem_offset;
-		psp2k_mem_offset += size;
-		psp2k_mem_left -= size;
-	}
-	return mem;
-}
-
-
-/*--------------------------------------------------------
-	宙処、オ、□ソ□モ□リ・皈筵熙□ニ□
---------------------------------------------------------*/
-
-static void *psp2k_mem_move(void *mem, INT32 size)
-{
-	if (!mem) return NULL;
-
-	if (size <= psp2k_mem_left)
-	{
-		memcpy((UINT8 *)psp2k_mem_offset, mem, size);
-		free(mem);
-
-		mem = (UINT8 *)psp2k_mem_offset;
-		psp2k_mem_offset += size;
-		psp2k_mem_left   -= size;
-	}
-	return mem;
-}
-
-
-/*--------------------------------------------------------
-	・皈筵□□□□_ユJ、キ、ニfree()
---------------------------------------------------------*/
-
-static void psp2k_mem_free(void *mem)
-{
-	if (!mem || MEMORY_IS_PSP2K(mem))
-		return;	// 宙処・皈筵熙マス箙ナ、キ、ハ、、(・ユ・□`・コ、ケ、□
-
-	free(mem);
-}
-
-#endif
-
-
-/******************************************************************************
 	ROMユi、゜゛z、゜
 ******************************************************************************/
 
@@ -837,13 +770,8 @@ static int load_rom_gfx3(void)
 {
 	if (!encrypt_gfx3)
 	{
-#ifdef PSP_SLIM
-		if ((memory_region_gfx3 = psp2k_mem_alloc(memory_length_gfx3)) == NULL)
-#endif
-		{
-			memory_region_gfx3 = memalign(MEM_ALIGN, memory_length_gfx3);
-		}
-
+      memory_region_gfx3 = memalign(MEM_ALIGN, memory_length_gfx3);
+	
 		if (memory_region_gfx3 != NULL)
 		{
 			int i, res;
@@ -940,8 +868,8 @@ static int load_rom_sound1(void)
 		memory_length_sound1 = 0;
 		return 1;
 	}
-#ifndef PSP_SLIM
-	if (disable_sound)
+
+   if (disable_sound)
 	{
 		return 1;
 	}
@@ -951,25 +879,6 @@ static int load_rom_sound1(void)
 		error_memory("REGION_SOUND1");
 		return 0;
 	}
-#else
-	if ((memory_region_sound1 = memalign(MEM_ALIGN, memory_length_sound1)) == NULL)
-	{
-		if (disable_sound)
-		{
-			if ((memory_region_sound1 = psp2k_mem_alloc(memory_length_sound1)) == NULL)
-			{
-				return 1;
-			}
-		}
-		else
-		{
-			error_memory("REGION_SOUND1");
-			return 0;
-		}
-	}
-
-	disable_sound = 0;
-#endif
 
 	memset(memory_region_sound1, 0, memory_length_sound1);
 
@@ -1595,11 +1504,6 @@ int memory_init(void)
 	gfx_pen_usage[1] = NULL;
 	gfx_pen_usage[2] = NULL;
 
-#ifdef PSP_SLIM
-	psp2k_mem_offset = PSP2K_MEM_TOP;
-	psp2k_mem_left   = PSP2K_MEM_SIZE;
-#endif
-
 	cache_init();
 	pad_wait_clear();
 
@@ -1705,30 +1609,6 @@ int memory_init(void)
 	if (load_rom_gfx4() == 0) return 0;
 
 	if (load_rom_sound1() == 0) return 0;
-
-#ifdef PSP_SLIM
-	if (psp2k_mem_left != PSP2K_MEM_SIZE)
-	{
-		// sound1、ヌ宙処・皈筵熙ヒエ_ア」、キ、ソ因コマ
-
-		// ・ュ・罕テ・キ・褓Iモ□□Oチヲカ爨ッネ。、□ソ、皃ヒ、ウ、□゛、ヌエ_ア」、キ、ソ・皈筵熙ヌメニ□ソノトワ、ハ、筅ホ、□
-		// 宙処・皈筵熙ヒメニ□、ケ、□」
-		// 楼チヲ゜BセA、キ、ソエ□ュ、ハ□モ□□ユ、ア、ソ、、、ホ、ヌ。「エ_ア」、キ、ソ、ホ、ネト讀ホ□、ヌメニ□。」
-
-		memory_region_user3 = psp2k_mem_move(memory_region_user3, memory_length_user3);
-		memory_region_gfx4  = psp2k_mem_move(memory_region_gfx4,  memory_length_gfx4);
-		memory_region_gfx2  = psp2k_mem_move(memory_region_gfx2,  memory_length_gfx2);
-		memory_region_gfx1  = psp2k_mem_move(memory_region_gfx1,  memory_length_gfx1);
-		memory_region_cpu2  = psp2k_mem_move(memory_region_cpu2,  memory_length_cpu2);
-		memory_region_user1 = psp2k_mem_move(memory_region_user1, memory_length_user1);
-		memory_region_cpu1  = psp2k_mem_move(memory_region_cpu1,  memory_length_cpu1);
-
-		gfx_pen_usage[2] = psp2k_mem_move(gfx_pen_usage[2], memory_length_gfx3 / 128);
-		gfx_pen_usage[1] = psp2k_mem_move(gfx_pen_usage[1], memory_length_gfx2 / 32);
-		gfx_pen_usage[0] = psp2k_mem_move(gfx_pen_usage[0], memory_length_gfx1 / 32);
-	}
-#endif
-
 	if (load_rom_sound2() == 0) return 0;
 	if (load_rom_gfx3() == 0) return 0;
 
@@ -1957,27 +1837,6 @@ void memory_shutdown(void)
 
 	cache_shutdown();
 
-#ifdef PSP_SLIM
-	for (i = 0; i < 3; i++)
-		psp2k_mem_free(gfx_pen_usage[i]);
-
-	psp2k_mem_free(memory_region_cpu1);
-	psp2k_mem_free(memory_region_cpu2);
-	psp2k_mem_free(memory_region_gfx1);
-	psp2k_mem_free(memory_region_gfx2);
-	psp2k_mem_free(memory_region_gfx3);
-	psp2k_mem_free(memory_region_gfx4);
-	psp2k_mem_free(memory_region_sound1);
-	psp2k_mem_free(memory_region_sound2);
-	psp2k_mem_free(memory_region_user1);
-#if !RELEASE
-	psp2k_mem_free(memory_region_user2);
-#endif
-	psp2k_mem_free(memory_region_user3);
-
-	psp2k_mem_offset = PSP2K_MEM_TOP + PSP2K_MEM_SIZE;
-	psp2k_mem_left   = PSP2K_MEM_SIZE;
-#else
 	for (i = 0; i < 3; i++)
 	{
 		if (gfx_pen_usage[i])
@@ -1997,7 +1856,6 @@ void memory_shutdown(void)
 	if (memory_region_user2)  free(memory_region_user2);
 #endif
 	if (memory_region_user3)  free(memory_region_user3);
-#endif
 
 }
 

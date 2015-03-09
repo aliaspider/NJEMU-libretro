@@ -69,11 +69,6 @@ UINT8 *qsound_sharedram2;
 char cache_parent_name[16];
 #endif
 
-#ifdef PSP_SLIM
-UINT32 psp2k_mem_offset = PSP2K_MEM_TOP;
-INT32 psp2k_mem_left = PSP2K_MEM_SIZE;
-#endif
-
 
 /******************************************************************************
 	・□`・ォ・□欽□□我ハ□
@@ -240,9 +235,11 @@ static int load_rom_gfx1(void)
 	memset(gfx_pen_usage[TILE16], 0, gfx_total_elements[TILE16]);
 	memset(gfx_pen_usage[TILE32], 0, gfx_total_elements[TILE32]);
 
-	memory_region_gfx1 = (UINT8 *)psp2k_mem_offset;
-	psp2k_mem_offset += memory_length_gfx1;
-	psp2k_mem_left -= memory_length_gfx1;
+   if ((memory_region_gfx1 = memalign(MEM_ALIGN, memory_length_gfx1)) == NULL)
+   {
+      error_memory("REGION_GFX1");
+      return 0;
+   }
 
 	parent = strlen(parent_name) ? parent_name : NULL;
 
@@ -643,11 +640,6 @@ int memory_init(void)
 	gfx_pen_usage[TILE16] = NULL;
 	gfx_pen_usage[TILE32] = NULL;
 
-#ifdef PSP_SLIM
-	psp2k_mem_offset = PSP2K_MEM_TOP;
-	psp2k_mem_left   = PSP2K_MEM_SIZE;
-#endif
-
 #if USE_CACHE
 	cache_init();
 #endif
@@ -808,16 +800,9 @@ void memory_shutdown(void)
 
 	if (memory_region_cpu1)   free(memory_region_cpu1);
 	if (memory_region_cpu2)   free(memory_region_cpu2);
-#if USE_CACHE
 	if (memory_region_gfx1)   free(memory_region_gfx1);
-#endif
 	if (memory_region_sound1) free(memory_region_sound1);
 	if (memory_region_user1)  free(memory_region_user1);
-
-#ifdef PSP_SLIM
-	psp2k_mem_offset = PSP2K_MEM_TOP;
-	psp2k_mem_left   = PSP2K_MEM_SIZE;
-#endif
 
 }
 

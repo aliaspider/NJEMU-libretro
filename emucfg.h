@@ -84,7 +84,11 @@
 #define SYSTEM_NAME				"CPS2"
 #define FPS                   59.633333
 #define TICKS_PER_FRAME			16769.144773
+#ifdef PSP_SLIM
 #define USE_CACHE             1
+#else
+#define USE_CACHE             1
+#endif
 #define CACHE_VERSION			"V23"
 #define EEPROM_SIZE				128
 #define GULIST_SIZE				48*1024		// 48KB

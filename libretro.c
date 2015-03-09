@@ -90,8 +90,10 @@ void retro_init()
    getcwd(launchDir, MAX_PATH - 1);
    strcat(launchDir, "/");
 
+#if USE_CACHE
    strcpy(cache_dir, launchDir);
    strcat(cache_dir, "cache");
+#endif
 
    pad_init();
    video_init();

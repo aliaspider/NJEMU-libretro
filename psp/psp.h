@@ -45,12 +45,6 @@
 #include "psp/mp3.h"
 #endif
 
-#ifdef PSP_SLIM
-#define PSP2K_MEM_TOP		0xa000000//0xa000000
-#define PSP2K_MEM_BOTTOM	0xbffffff//0xbffffff
-#define PSP2K_MEM_SIZE		0x2000000//0x2000000
-#endif
-
 enum
 {
 	LOOP_EXIT = 0,

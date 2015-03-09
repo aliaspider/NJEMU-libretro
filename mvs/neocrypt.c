@@ -105,11 +105,7 @@ static UINT32 m1_address_scramble(UINT32 address, UINT16 key)
 int neogeo_cmc50_m1_decrypt(void)
 {
 	UINT8 *rom = memory_region_cpu2 + 0x10000;
-#ifdef PSP_SLIM
-	UINT8 *buf = (UINT8 *)psp2k_mem_offset;
-#else
 	UINT8 *buf = (UINT8 *)malloc(memory_length_cpu2);
-#endif
 	UINT32 i;
 	UINT16 key=generate_cs16(rom,0x10000);
 	int romsize = memory_length_cpu2;
@@ -158,9 +154,7 @@ if (buf)
 		}
 		memcpy(rom, buf, romsize);//
 
-#ifndef PSP_SLIM
-		free(buf);
-#endif
+      free(buf);
 		return 1;
 	}
 	return 0;
@@ -196,11 +190,7 @@ NeoGeo 'P' ROM encryption
 int kof98_decrypt_68k(void)
 {
 	UINT8 *src = memory_region_cpu1;
-#ifdef PSP_SLIM
-	UINT8 *dst = (UINT8 *)psp2k_mem_offset;
-#else
 	UINT8 *dst = (UINT8 *)malloc(0x200000);
-#endif
 	UINT32 i, j, k;
 	const UINT32 sec[]={0x000000,0x100000,0x000004,0x100004,0x10000a,0x00000a,0x10000e,0x00000e};
 	const UINT32 pos[]={0x000,0x004,0x00a,0x00e};
@@ -241,9 +231,7 @@ int kof98_decrypt_68k(void)
 		}
 		memcpy(&src[0x100000], &src[0x200000], 0x400000);
 
-#ifndef PSP_SLIM
-		free(dst);
-#endif
+      free(dst);
 		return 1;
 	}
 	return 0;
@@ -429,11 +417,7 @@ int kof2002_decrypt_68k(void)
 	const UINT32 sec[]={0x100000,0x280000,0x300000,0x180000,0x000000,0x380000,0x200000,0x080000};
 
 	UINT8 *src = memory_region_cpu1 + 0x100000;
-#ifdef PSP_SLIM
-	UINT8 *dst = (UINT8 *)psp2k_mem_offset;
-#else
-	UINT8 *dst = (UINT8 *)malloc(0x400000);
-#endif
+   UINT8 *dst = (UINT8 *)malloc(0x400000);
 	if (dst)
 	{
 		memcpy( dst, src, 0x400000 );
@@ -441,9 +425,7 @@ int kof2002_decrypt_68k(void)
 		{
 			memcpy( src+i*0x80000, dst+sec[i], 0x80000 );
 		}
-#ifndef PSP_SLIM
-		free(dst);
-#endif
+      free(dst);
 		return 1;
 	}
 	return 0;
@@ -454,22 +436,16 @@ int matrim_decrypt_68k(void)
 {
 	UINT32 i;
 	const UINT32 sec[]={0x100000,0x280000,0x300000,0x180000,0x000000,0x380000,0x200000,0x080000};
-	UINT8 *src = memory_region_cpu1 +0x100000;
-#ifdef PSP_SLIM
-	UINT8 *dst = (UINT8 *)psp2k_mem_offset;
-#else
-	UINT8 *dst = (UINT8 *)malloc(0x400000);
-#endif
+   UINT8 *src = memory_region_cpu1 +0x100000;
+   UINT8 *dst = (UINT8 *)malloc(0x400000);
 	if (dst)
 	{
 		memcpy( dst, src, 0x400000);
 		for( i=0; i<8; ++i )
 		{
 			memcpy( src+i*0x80000, dst+sec[i], 0x80000 );
-		}
-#ifndef PSP_SLIM
-		free(dst);
-#endif
+      }
+      free(dst);
 		return 1;
 	}
 	return 0;
@@ -481,11 +457,7 @@ int samsho5_decrypt_68k(void)
 	UINT32 i;
 	const UINT32 sec[]={0x000000,0x080000,0x700000,0x680000,0x500000,0x180000,0x200000,0x480000,0x300000,0x780000,0x600000,0x280000,0x100000,0x580000,0x400000,0x380000};
 	UINT8 *src = memory_region_cpu1;
-#ifdef PSP_SLIM
-	UINT8 *dst = (UINT8 *)psp2k_mem_offset;
-#else
 	UINT8 *dst = (UINT8 *)malloc(0x800000);
-#endif
 	if (dst)
 	{
 		memcpy( dst, src, 0x800000 );
@@ -493,9 +465,7 @@ int samsho5_decrypt_68k(void)
 		{
 			memcpy( src+i*0x80000, dst+sec[i], 0x80000 );
 		}
-#ifndef PSP_SLIM
 		free(dst);
-#endif
 		return 1;
 	}
 	return 0;
@@ -506,11 +476,7 @@ int samsh5sp_decrypt_68k(void)
 	UINT32 i;
 	const UINT32 sec[]={0x000000,0x080000,0x500000,0x480000,0x600000,0x580000,0x700000,0x280000,0x100000,0x680000,0x400000,0x780000,0x200000,0x380000,0x300000,0x180000};
 	UINT8 *src = memory_region_cpu1;
-#ifdef PSP_SLIM
-	UINT8 *dst = (UINT8 *)psp2k_mem_offset;
-#else
 	UINT8 *dst = (UINT8 *)malloc(0x800000);
-#endif
 	if (dst)
 	{
 		memcpy( dst, src, 0x800000 );
@@ -518,9 +484,7 @@ int samsh5sp_decrypt_68k(void)
 		{
 			memcpy( src+i*0x80000, dst+sec[i], 0x80000 );
 		}
-#ifndef PSP_SLIM
 		free(dst);
-#endif
 		return 1;
 	}
 	return 0;
@@ -551,11 +515,7 @@ int mslug5_decrypt_68k(void)
 	};
 	UINT32 i, offset;
 	UINT8 *rom = memory_region_cpu1;
-#ifdef PSP_SLIM
-	UINT8 *buf = (UINT8 *)psp2k_mem_offset;
-#else
 	UINT8 *buf = (UINT8 *)malloc(0x800000);
-#endif
 
 	if (buf)
 	{
@@ -594,9 +554,7 @@ int mslug5_decrypt_68k(void)
 		memcpy(&rom[0x100000], &buf[0x700000], 0x100000);
 		memcpy(&rom[0x200000], &buf[0x100000], 0x600000);
 
-#ifndef PSP_SLIM
 		free(buf);
-#endif
 		return 1;
 	}
 	return 0;
@@ -620,11 +578,7 @@ int svc_px_decrypt(void)
 	};
 	UINT32 i, offset;
 	UINT8 *rom = memory_region_cpu1;
-#ifdef PSP_SLIM
-	UINT8 *buf = (UINT8 *)psp2k_mem_offset;
-#else
 	UINT8 *buf = (UINT8 *)malloc(0x800000);
-#endif
 
 	if (buf)
 	{
@@ -662,9 +616,7 @@ int svc_px_decrypt(void)
 		memcpy(buf, rom, 0x800000);
 		memcpy(&rom[0x100000], &buf[0x700000], 0x100000);
 		memcpy(&rom[0x200000], &buf[0x100000], 0x600000);
-#ifndef PSP_SLIM
 		free(buf);
-#endif
 		return 1;
 	}
 	return 0;
@@ -681,11 +633,7 @@ int kf2k3pcb_decrypt_68k(void)
 	};
 	UINT32 i, offset;
 	UINT8 *rom = memory_region_cpu1;
-#ifdef PSP_SLIM
-	UINT8 *buf = (UINT8 *)psp2k_mem_offset;
-#else
 	UINT8 *buf = (UINT8 *)malloc(0x800000);
-#endif
 
 	if (buf)
 	{
@@ -723,9 +671,7 @@ int kf2k3pcb_decrypt_68k(void)
 
 		memcpy(&rom[0x100000], &buf[0x700000], 0x100000);
 		memcpy(&rom[0x200000], &buf[0x000000], 0x700000);
-#ifndef PSP_SLIM
 		free(buf);
-#endif
 		return 1;
 	}
 	return 0;
@@ -749,11 +695,7 @@ int kof2003_decrypt_68k(void)
 	};
 	UINT32 i, offset;
 	UINT8 *rom = memory_region_cpu1;
-#ifdef PSP_SLIM
-	UINT8 *buf = (UINT8 *)psp2k_mem_offset;
-#else
 	UINT8 *buf = (UINT8 *)malloc(0x800000);
-#endif
 
 	if (buf)
 	{
@@ -794,9 +736,7 @@ int kof2003_decrypt_68k(void)
 		}
 		memcpy(&rom[0x100000], &buf[0x700000], 0x100000);
 		memcpy(&rom[0x200000], &buf[0x000000], 0x700000);
-#ifndef PSP_SLIM
 		free(buf);
-#endif
 		return 1;
 	}
 	return 0;
@@ -822,11 +762,7 @@ int kof2003h_decrypt_68k(void)
 
 	UINT32 i, offset;
 	UINT8 *rom = memory_region_cpu1;
-#ifdef PSP_SLIM
-	UINT8 *buf = (UINT8 *)psp2k_mem_offset;
-#else
 	UINT8 *buf = (UINT8 *)malloc(0x800000);
-#endif
 
 	if (buf)
 	{
@@ -867,9 +803,7 @@ int kof2003h_decrypt_68k(void)
 		}
 		memcpy(&rom[0x100000], &buf[0x700000], 0x100000);
 		memcpy(&rom[0x200000], &buf[0x000000], 0x700000);
-#ifndef PSP_SLIM
 		free(buf);
-#endif
 		return 1;
 	}
 	return 0;
@@ -890,11 +824,7 @@ int kf2k3pcb_sp1_decrypt(void)
 		0x04,0x00,0x04,0x00,0x0e,0x0a,0x0e,0x0a
 	};
 	UINT16 *rom = (UINT16 *)memory_region_user1;
-#ifdef PSP_SLIM
-	UINT16 *buf = (UINT16 *)psp2k_mem_offset;
-#else
 	UINT16 *buf = (UINT16 *)malloc(0x80000/2);
-#endif
 	UINT32 i, addr;
 
 	if (buf)
@@ -920,9 +850,7 @@ int kf2k3pcb_sp1_decrypt(void)
 		}
 		memcpy(rom, buf, 0x80000);
 
-#ifndef PSP_SLIM
 		free(buf);
-#endif
 
 		return 1;
 	}
@@ -949,11 +877,7 @@ int kf2k3pcb_sp1_decrypt(void)
 int kog_px_decrypt(void)
 {
 	UINT8 *src = memory_region_cpu1;
-#ifdef PSP_SLIM
-	UINT8 *dst = (UINT8 *)psp2k_mem_offset;
-#else
 	UINT8 *dst = (UINT8 *)malloc(0x600000);
-#endif
 	UINT16 *rom = (UINT16 *)memory_region_cpu1;
 	UINT32 i;
 	const UINT8 sec[] = { 0x3, 0x8, 0x7, 0xC, 0x1, 0xA, 0x6, 0xD };
@@ -972,9 +896,7 @@ int kog_px_decrypt(void)
 		memcpy(dst + 0x100000, src + 0x200000, 0x400000);
 		memcpy(src, dst, 0x600000);
 
-#ifndef PSP_SLIM
 		free(dst);
-#endif
 
 		for (i = 0x90000/2; i < 0x94000/2; i++)
 		{
@@ -1027,11 +949,7 @@ int kof97oro_px_decode(void)
 {
 	UINT32 i;
 	UINT16 *src = (UINT16*)memory_region_cpu1;
-#ifdef PSP_SLIM
-	UINT16 *dst = (UINT16 *)psp2k_mem_offset;
-#else
 	UINT16 *dst = (UINT16 *)malloc(0x500000);
-#endif
 	if (dst)
 	{
 		for (i = 0; i < 0x500000/2; i++)
@@ -1041,9 +959,7 @@ int kof97oro_px_decode(void)
 
 	memcpy (src, dst, 0x500000);
 
-#ifndef PSP_SLIM
 		free(dst);
-#endif
 		return 1;
 	}
 	return 0;
@@ -1053,11 +969,7 @@ int kof97oro_px_decode(void)
 int kof10th_px_decrypt(void)
 {
 	UINT32 i, j;
-#ifdef PSP_SLIM
-	UINT8 *dst = (UINT8 *)psp2k_mem_offset;
-#else
 	UINT8 *dst = (UINT8 *)malloc(0x900000);
-#endif
 	UINT8 *src = memory_region_cpu1;
 	UINT16 *mem16 = (UINT16 *)memory_region_cpu1;
 
@@ -1072,9 +984,7 @@ int kof10th_px_decrypt(void)
 			src[j] = dst[i];
 		}
 
-#ifndef PSP_SLIM
 		free(dst);
-#endif
 
 		mem16[0x0124/2] = 0x000d;
 		mem16[0x0126/2] = 0xf7a8;
@@ -1098,11 +1008,7 @@ int kf10thep_px_decrypt(void)
 	UINT16 *rom = (UINT16*)memory_region_cpu1;
 	UINT8  *src = memory_region_cpu1;
 	UINT16 *buf = (UINT16*)memory_region_user2;
-#ifdef PSP_SLIM
-	UINT8 *dst = (UINT8 *)psp2k_mem_offset;
-#else
 	UINT8 *dst = (UINT8 *)malloc(0x200000);
-#endif
 
 	if (dst)
 	{
@@ -1130,9 +1036,7 @@ int kf10thep_px_decrypt(void)
 		rom[0x00022c/2] = 0x4e71;
 		rom[0x000234/2] = 0x4e71; // bne
 		rom[0x000236/2] = 0x4e71; // bne
-#ifndef PSP_SLIM
 		free(dst);
-#endif
 		return 1;
 	}
 	return 0;
@@ -1142,11 +1046,7 @@ int kf2k5uni_px_decrypt(void)
 {
 	UINT32 i, j, offset;
 	UINT8 *src = memory_region_cpu1;
-#ifdef PSP_SLIM
-	UINT8 *dst = (UINT8 *)psp2k_mem_offset;
-#else
 	UINT8 *dst = (UINT8 *)malloc(0x80);
-#endif
 	UINT16 *mem16 = (UINT16 *)memory_region_cpu1;
 
 	if (dst)
@@ -1160,9 +1060,7 @@ int kf2k5uni_px_decrypt(void)
 			}
 			memcpy(src + i, dst, 0x80);
 		}
-#ifndef PSP_SLIM
 		free(dst);
-#endif
 
 		memcpy(src, src + 0x600000, 0x100000);
 
@@ -1180,11 +1078,7 @@ int kf2k2mp_px_decrypt(void)
 {
 	UINT32 i, j, offset;
 	UINT8 *src = memory_region_cpu1;
-#ifdef PSP_SLIM
-	UINT8 *dst = (UINT8 *)psp2k_mem_offset;
-#else
 	UINT8 *dst = (UINT8 *)malloc(0x80);
-#endif
 
 	if (dst)
 	{
@@ -1199,9 +1093,7 @@ int kf2k2mp_px_decrypt(void)
 			}
 			memcpy(src + i, dst, 0x80);
 		}
-#ifndef PSP_SLIM
 		free(dst);
-#endif
 		return 1;
 	}
 	return 0;
@@ -1210,11 +1102,7 @@ int kf2k2mp_px_decrypt(void)
 int kf2k2mp2_px_decrypt(void)
 {
 	UINT8 *src = memory_region_cpu1;
-#ifdef PSP_SLIM
-	UINT8 *dst = (UINT8 *)psp2k_mem_offset;
-#else
 	UINT8 *dst = (UINT8 *)malloc(0x600000);
-#endif
 
 	if (dst)
 	{
@@ -1223,9 +1111,7 @@ int kf2k2mp2_px_decrypt(void)
 		memcpy(dst + 0x0C0000, src + 0x100000, 0x040000);
 		memcpy(dst + 0x100000, src + 0x200000, 0x400000);
 		memcpy(src + 0x000000, dst + 0x000000, 0x600000);
-#ifndef PSP_SLIM
 		free(dst);
-#endif
 		return 1;
 	}
 	return 0;
@@ -1234,11 +1120,7 @@ int kf2k2mp2_px_decrypt(void)
 int kof2k4se_px_decrypt(void)
 {
 	UINT8 *src = memory_region_cpu1 + 0x100000;
-#ifdef PSP_SLIM
-	UINT8 *dst = (UINT8 *)psp2k_mem_offset;
-#else
 	UINT8 *dst = (UINT8 *)malloc(0x400000);
-#endif
 	UINT32 i;
 	const UINT32 sec[] = { 0x300000, 0x200000, 0x100000, 0x000000 };
 
@@ -1250,9 +1132,7 @@ int kof2k4se_px_decrypt(void)
 		{
 			memcpy(src + i * 0x100000, dst + sec[i], 0x100000);
 		}
-#ifndef PSP_SLIM
 		free(dst);
-#endif
 		return 1;
 	}
 	return 0;
@@ -1263,11 +1143,7 @@ int lans2004_px_decrypt(void)
 	const UINT8 sec[] = { 0x3, 0x8, 0x7, 0xc, 0x1, 0xa, 0x6, 0xd };
 	UINT32 i;
 	UINT8 *src = memory_region_cpu1;
-#ifdef PSP_SLIM
-	UINT8 *dst = (UINT8 *)psp2k_mem_offset;
-#else
 	UINT8 *dst = (UINT8 *)malloc(0x600000);
-#endif
 	UINT16 *rom = (UINT16*)memory_region_cpu1;
 
 	if (dst)
@@ -1279,9 +1155,7 @@ int lans2004_px_decrypt(void)
 		memcpy(dst + 0x02fff0, src + 0x1a92be, 0x000010);
 		memcpy(dst + 0x100000, src + 0x200000, 0x400000);
 		memcpy(src, dst, 0x600000);
-#ifndef PSP_SLIM
 		free(dst);
-#endif
 
 		for (i = 0xbbb00/2; i < 0xbe000/2; i++)
 		{
@@ -1309,11 +1183,7 @@ int svcboot_px_decrypt(void)
 	const UINT8 sec[] = { 0x06, 0x07, 0x01, 0x02, 0x03, 0x04, 0x05, 0x00 };
 	UINT32 i, offset;
 	UINT8 *src = memory_region_cpu1;
-#ifdef PSP_SLIM
-	UINT8 *dst = (UINT8 *)psp2k_mem_offset;
-#else
 	UINT8 *dst = (UINT8 *)malloc(memory_length_cpu1);
-#endif
 
 	if (dst)
 	{
@@ -1327,9 +1197,7 @@ int svcboot_px_decrypt(void)
 			offset += (i & 0xffff00);
 			memcpy(&src[i << 1], &dst[offset << 1], 2);
 		}
-#ifndef PSP_SLIM
 		free(dst);
-#endif
 		return 1;
 	}
 	return 0;
@@ -1340,11 +1208,7 @@ int svcplus_px_decrypt(void)
 	const UINT8 sec[] = { 0x00, 0x03, 0x02, 0x05, 0x04, 0x01 };
 	UINT32 i, offset;
 	UINT8 *src = memory_region_cpu1;
-#ifdef PSP_SLIM
-	UINT8 *dst = (UINT8 *)psp2k_mem_offset;
-#else
-	UINT8 *dst = (UINT8 *)malloc(memory_length_cpu1);
-#endif
+   UINT8 *dst = (UINT8 *)malloc(memory_length_cpu1);
 
 	if (dst)
 	{
@@ -1361,10 +1225,8 @@ int svcplus_px_decrypt(void)
 		for (i = 0; i < 6; i++)
 		{
 			memcpy(&src[i << 20], &dst[sec[i] << 20], 0x100000);
-		}
-#ifndef PSP_SLIM
-		free(dst);
-#endif
+      }
+      free(dst);
 
 		src[0x0f8010] = 0x40;
 		src[0x0f8011] = 0x04;
@@ -1384,12 +1246,8 @@ int svcplusa_px_decrypt(void)
 {
 	const UINT8 sec[] = { 0x01, 0x02, 0x03, 0x04, 0x05, 0x00 };
 	UINT32 i;
-	UINT8 *src = memory_region_cpu1;
-#ifdef PSP_SLIM
-	UINT8 *dst = (UINT8 *)psp2k_mem_offset;
-#else
-	UINT8 *dst = (UINT8 *)malloc(memory_length_cpu1);
-#endif
+   UINT8 *src = memory_region_cpu1;
+   UINT8 *dst = (UINT8 *)malloc(memory_length_cpu1);
 
 	if (dst)
 	{
@@ -1397,10 +1255,8 @@ int svcplusa_px_decrypt(void)
 		for (i = 0; i < 6; i++)
 		{
 			memcpy(&src[i << 20], &dst[sec[i] << 20], 0x100000);
-		}
-#ifndef PSP_SLIM
-		free(dst);
-#endif
+      }
+      free(dst);
 
 		src[0x0f8010] = 0x40;
 		src[0x0f8011] = 0x04;
@@ -1421,11 +1277,7 @@ int svcsplus_px_decrypt(void)
 	const UINT8 sec[] = { 0x06, 0x07, 0x01, 0x02, 0x03, 0x04, 0x05, 0x00 };
 	UINT32 i, offset;
 	UINT8 *src = memory_region_cpu1;
-#ifdef PSP_SLIM
-	UINT8 *dst = (UINT8 *)psp2k_mem_offset;
-#else
-	UINT8 *dst = (UINT8 *)malloc(memory_length_cpu1);
-#endif
+   UINT8 *dst = (UINT8 *)malloc(memory_length_cpu1);
 	UINT16 *mem16 = (UINT16 *)memory_region_cpu1;
 
 	if (dst)
@@ -1439,10 +1291,8 @@ int svcsplus_px_decrypt(void)
 			offset += (i & 0x078000);
 			offset += sec[(i & 0xf80000) >> 19] << 19;
 			memcpy(&src[i << 1], &dst[offset << 1], 2);
-		}
-#ifndef PSP_SLIM
-		free(dst);
-#endif
+      }
+      free(dst);
 
 		mem16[0x9e90/2] = 0x000f;
 		mem16[0x9e92/2] = 0xc9c0;
@@ -1460,11 +1310,7 @@ int kf2k3bl_px_decrypt(void)
 	const UINT8 sec[] = { 0x07, 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 };
 	UINT32 i;
 	UINT8 *rom = memory_region_cpu1;
-#ifdef PSP_SLIM
-	UINT8 *buf = (UINT8 *)psp2k_mem_offset;
-#else
-	UINT8 *buf = (UINT8 *)malloc(0x800000);
-#endif
+   UINT8 *buf = (UINT8 *)malloc(0x800000);
 
 	if (buf)
 	{
@@ -1473,10 +1319,8 @@ int kf2k3bl_px_decrypt(void)
 		for (i = 0; i < 8; i++)
 		{
 			memcpy(&rom[i * 0x100000], &buf[sec[i] * 0x100000], 0x100000);
-		}
-#ifndef PSP_SLIM
+      }
 		free(buf);
-#endif
 		return 1;
 	}
 	return 0;
@@ -1485,11 +1329,7 @@ int kf2k3bl_px_decrypt(void)
 int kf2k3pl_px_decrypt(void)
 {
 	UINT32 i, j;
-#ifdef PSP_SLIM
-	UINT16 *buf = (UINT16 *)psp2k_mem_offset;
-#else
-	UINT16 *buf = (UINT16 *)malloc(0x100000);
-#endif
+   UINT16 *buf = (UINT16 *)malloc(0x100000);
 	UINT16 *rom = (UINT16*)memory_region_cpu1;
 
 	if (buf)
@@ -1499,10 +1339,8 @@ int kf2k3pl_px_decrypt(void)
 			memcpy(buf, &rom[i], 0x100000);
 			for (j = 0; j < 0x100000/2; j++)
 				rom[i + j] = buf[BITSWAP24(j,23,22,21,20,19,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18)];
-		}
-#ifndef PSP_SLIM
-		free(buf);
-#endif
+      }
+      free(buf);
 
 		rom[0xf38ac/2] = 0x4e75;
 		return 1;
@@ -1533,11 +1371,7 @@ int samsho5b_px_decrypt(void)
 {
 	UINT32 i, offset;
 	UINT8 *rom = memory_region_cpu1;
-#ifdef PSP_SLIM
-	UINT8 *buf = (UINT8 *)psp2k_mem_offset;
-#else
-	UINT8 *buf = (UINT8 *)malloc(memory_length_cpu1);
-#endif
+   UINT8 *buf = (UINT8 *)malloc(memory_length_cpu1);
 
 	if (buf)
 	{
@@ -1557,9 +1391,7 @@ int samsho5b_px_decrypt(void)
 		memcpy(&rom[0x000000], &buf[0x700000], 0x100000);
 		memcpy(&rom[0x100000], &buf[0x000000], 0x700000);
 
-#ifndef PSP_SLIM
-		free(buf);
-#endif
+      free(buf);
 		return 1;
 	}
 	return 0;
@@ -1591,11 +1423,7 @@ int cthd2k3a_px_decrypt(void)
 		0x09, 0x20, 0x18, 0x1f, 0x1e, 0x12, 0x0d, 0x11
 	};
 	UINT8 *src = memory_region_cpu1;
-#ifdef PSP_SLIM
-	UINT8 *dst = (UINT8 *)psp2k_mem_offset;
-#else
-	UINT8 *dst = (UINT8 *)malloc(0x500000);
-#endif
+   UINT8 *dst = (UINT8 *)malloc(0x500000);
 
 	if (dst)
 	{
@@ -1603,10 +1431,8 @@ int cthd2k3a_px_decrypt(void)
 		{
 			memcpy(dst + i * 0x20000, src + bank[i] * 0x20000, 0x20000);
 		}
-		memcpy(src, dst, 0x500000);
-#ifndef PSP_SLIM
-		free(dst);
-#endif
+      memcpy(src, dst, 0x500000);
+      free(dst);
 		return 1;
 	}
 	return 0;
@@ -1615,11 +1441,7 @@ int cthd2k3a_px_decrypt(void)
 int kf2k4pls_px_decrypt(void)
 {
 	UINT8 *src = memory_region_cpu1;
-#ifdef PSP_SLIM
-	UINT8 *dst = (UINT8 *)psp2k_mem_offset;
-#else
 	UINT8 *dst = (UINT8 *)malloc(0x200000);
-#endif
 
 	if (dst)
 	{
@@ -1632,10 +1454,8 @@ int kf2k4pls_px_decrypt(void)
 		memcpy(src + 0x080000, dst + 0x180000, 0x020000);
 		memcpy(src + 0x0a0000, dst + 0x0a0000, 0x020000);
 		memcpy(src + 0x0c0000, dst + 0x100000, 0x020000);
-		memcpy(src + 0x0e0000, dst + 0x040000, 0x020000);
-#ifndef PSP_SLIM
-		free(dst);
-#endif
+      memcpy(src + 0x0e0000, dst + 0x040000, 0x020000);
+      free(dst);
 		return 1;
 	}
 	return 0;
@@ -1715,11 +1535,7 @@ void kf2k1pa_sx_decrypt(void)
 void matrimbl_mx_decrypt(void)
 {
 	UINT8 *src = memory_region_cpu2 + 0x10000;
-#ifdef PSP_SLIM
-	UINT8 *dst = (UINT8 *)psp2k_mem_offset;
-#else
-	UINT8 *dst = malloc(0x20000);
-#endif
+   UINT8 *dst = malloc(0x20000);
 	UINT32 i, j = 0;
 
 	if (dst)
@@ -1753,10 +1569,8 @@ void matrimbl_mx_decrypt(void)
 				}
 			}
 			src[j] = dst[i];
-		}
-#ifndef PSP_SLIM
-		free(dst);
-#endif
+      }
+      free(dst);
 	}
 }
 
