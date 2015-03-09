@@ -10,7 +10,7 @@ char launchDir[MAX_PATH];
 
 #include <stdio.h>
 #include <string.h>
-//#include <stdarg.h>
+#include <stdarg.h>
 
 static retro_log_printf_t log_cb;
 static retro_video_refresh_t video_cb;
@@ -23,6 +23,34 @@ static PspGeContext main_context_buffer;
 static PspGeContext njemu_context_buffer;
 //static int main_context_state;
 //static int njemu_context_state;
+
+static bool game_is_loading = false;
+
+void msg_printf(const char *text, ...)
+{
+   static char message_buffer[1024];
+   va_list arg;
+
+   va_start(arg, text);
+   vsnprintf(message_buffer, sizeof(message_buffer), text, arg);
+   va_end(arg);
+
+   if (game_is_loading)
+   {
+      pspDebugScreenPrintf("%s",message_buffer);
+   }
+
+   printf("%s", message_buffer);
+}
+
+void fatalerror(const char *text, ...)
+{
+   va_list arg;
+
+   va_start(arg, text);
+   vprintf(text, arg);
+   va_end(arg);
+}
 
 void retro_get_system_info(struct retro_system_info *info)
 {
@@ -58,13 +86,12 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
 
 void retro_init()
 {
+   game_is_loading = false;
    getcwd(launchDir, MAX_PATH - 1);
    strcat(launchDir, "/");
 
    strcpy(cache_dir, launchDir);
    strcat(cache_dir, "cache");
-
-   printf("\n%s\n",launchDir);
 
    pad_init();
    video_init();
@@ -127,6 +154,7 @@ void retro_cheat_set(unsigned index, bool enabled, const char *code) {}
 bool retro_load_game(const struct retro_game_info *info)
 {
    char* temp_p;
+   bool ret;
    enum retro_pixel_format fmt = RETRO_PIXEL_FORMAT_RGB565;
    if (!environ_cb(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt))
    {
@@ -156,11 +184,17 @@ bool retro_load_game(const struct retro_game_info *info)
    sceGeSaveContext(&main_context_buffer);
    sceGeRestoreContext(&njemu_context_buffer);
 
-   return machine_main();
+   pspDebugScreenInitEx(NULL, PSP_DISPLAY_PIXEL_FORMAT_565, 1);
 
-   sceGuSync(0,0);
-   sceGeSaveContext(&njemu_context_buffer);
-   sceGeRestoreContext(&main_context_buffer);
+   game_is_loading = true;
+   ret = machine_main();
+   game_is_loading = false;
+
+//   sceGuSync(0,0);
+//   sceGeSaveContext(&njemu_context_buffer);
+//   sceGeRestoreContext(&main_context_buffer);
+
+   return ret;
 }
 
 

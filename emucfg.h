@@ -75,23 +75,17 @@
 
 #elif defined(BUILD_CPS2PSP)
 
-#define APPNAME_STR				"CAPCOM CPS2 Emulator for PSP"
+#define APPNAME_STR			"CAPCOM CPS2 Emulator for PSP"
 #define machine_main			cps2_main
 #define machine_reset		cps2_reset
 #define machine_exit			cps2_exit
 
 #define EMU_SYSTEM				CPS2
 #define SYSTEM_NAME				"CPS2"
-#define FPS						59.633333
+#define FPS                   59.633333
 #define TICKS_PER_FRAME			16769.144773
-#ifdef PSP_SLIM
-//#define USE_CACHE				0
-#define USE_CACHE				1
+#define USE_CACHE             1
 #define CACHE_VERSION			"V23"
-#else
-#define USE_CACHE				1
-#define CACHE_VERSION			"V22"
-#endif
 #define EEPROM_SIZE				128
 #define GULIST_SIZE				48*1024		// 48KB
 #define ENABLE_RASTER_OPTION	0			// off

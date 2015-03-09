@@ -9,20 +9,8 @@
 #include "emumain.h"
 
 #if USE_CACHE
-#ifdef PSP_SLIM
 #define MIN_CACHE_SIZE		0x40		// マツマ゛  ヤュハシ0x40,4MB
-#else
-#define MIN_CACHE_SIZE		0x20		// マツマ゛  ヤュハシ0x40,4MB
-#endif
-/*
-32MB 0x200 660CFW exit pspfiler and tempgba,crash.
-26MB 0x1a0 620CFW push vol and screen button crash.
-*/
-#ifdef PSP_SLIM
-#define MAX_CACHE_SIZE		0x200		// ノママ゛ 32MB 0x200  
-#else
-#define MAX_CACHE_SIZE		0x140		// ノママ゛ 20MB 0x140
-#endif
+#define MAX_CACHE_SIZE		0x400		// ノママ゛ 64MB 0x140
 #define CACHE_SAFETY		0x20000		// ・ュ・罕テ・キ・蟠_ア」矣、ホソユ、ュ・皈筵□オ・、・コ 128KB
 #define BLOCK_SIZE			0x10000		// 1・ヨ・□テ・ッ、ホ・オ・、・コ = 64KB 0x10000 ヘシマ□ミケリ
 #define BLOCK_MASK			0xffff
