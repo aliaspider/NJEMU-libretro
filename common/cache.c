@@ -9,9 +9,10 @@
 #include "emumain.h"
 
 #if USE_CACHE
-#define MIN_CACHE_SIZE		0x40		// マツマ゛  ヤュハシ0x40,4MB
+#define MIN_CACHE_SIZE		0x10		// マツマ゛  ヤュハシ0x40,4MB
 #define MAX_CACHE_SIZE		0x400		// ノママ゛ 64MB 0x140
 #define CACHE_SAFETY		0x20000		// ・ュ・罕テ・キ・蟠_ア」矣、ホソユ、ュ・皈筵□オ・、・コ 128KB
+#define MIN_MEMORY_BLOCK_SIZE_LEFT 0x200000
 #define BLOCK_SIZE			0x10000		// 1・ヨ・□テ・ッ、ホ・オ・、・コ = 64KB 0x10000 ヘシマ□ミケリ
 #define BLOCK_MASK			0xffff
 #define BLOCK_SHIFT			16			// 16
@@ -535,7 +536,7 @@ void cache_init(void)
 
 int cache_start(void)
 {
-	int i, found;
+   int i, found, max_block_left;
 	UINT32 size = 0;
 	char version_str[8];
 #if (EMU_SYSTEM == MVS)
@@ -693,9 +694,14 @@ int cache_start(void)
 		return 0;
 	}
 
-	if ((GFX_MEMORY = (UINT8 *)memalign(MEM_ALIGN, GFX_SIZE + CACHE_SAFETY)) != NULL)
+   display_available_memory();
+   GFX_MEMORY = (UINT8 *)memalign(MEM_ALIGN, GFX_SIZE + CACHE_SAFETY);
+   max_block_left = get_max_free_block_size();
+
+   free(GFX_MEMORY);
+
+   if ((GFX_MEMORY != NULL) && (max_block_left >= MIN_MEMORY_BLOCK_SIZE_LEFT))
 	{
-		free(GFX_MEMORY);
 		GFX_MEMORY = (UINT8 *)memalign(MEM_ALIGN, GFX_SIZE);
 		memset(GFX_MEMORY, 0, GFX_SIZE);
 
@@ -720,12 +726,18 @@ int cache_start(void)
       {
          if ((GFX_MEMORY = (UINT8 *)memalign(MEM_ALIGN, (i << BLOCK_SHIFT) + CACHE_SAFETY)) != NULL)
          {
-            size = i << BLOCK_SHIFT;
+            max_block_left = get_max_free_block_size();
             free(GFX_MEMORY);
             GFX_MEMORY = NULL;
-            break;
+            if (max_block_left >= MIN_MEMORY_BLOCK_SIZE_LEFT)
+            {
+               size = i << BLOCK_SHIFT;
+               break;
+            }
          }
       }
+
+      display_available_memory();
 
       if (i < MIN_CACHE_SIZE)
       {

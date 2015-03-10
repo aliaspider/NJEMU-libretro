@@ -1,5 +1,5 @@
 SYSTEM   = cps2
-PSP      = slim
+PSP      = fat
 DEBUG    = 0
 
 CC = psp-gcc

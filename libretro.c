@@ -43,6 +43,70 @@ void msg_printf(const char *text, ...)
    printf("%s", message_buffer);
 }
 
+static int free_space_counter;
+
+static void recurse_memory (int size)
+{
+   if (size <= 0x100)
+      return;
+
+   void* tmp = malloc(size);
+   if (tmp)
+   {
+      free_space_counter += size;
+      recurse_memory(size);
+      free(tmp);
+   }
+   else
+   {
+      recurse_memory(size>>1);
+   }
+}
+
+int get_free_space(void)
+{
+   free_space_counter = 0;
+   recurse_memory(0x4000000);
+
+   return free_space_counter;
+}
+
+void display_free_space(void)
+{
+   msg_printf("free_space_size = %i\n", get_free_space());
+
+}
+
+int get_max_free_block_size(void)
+{
+   int size = 0;
+   int chunk = 0x2000000;
+
+   while (chunk > 0x100)
+   {
+      void* tmp = malloc(size + chunk);
+      if (tmp)
+      {
+         free(tmp);
+         size += chunk;
+      }
+      chunk >>= 1;
+   }
+
+   return size;
+}
+
+void display_max_free_block_size(void)
+{
+   msg_printf("max_free_block_size = %i\n", get_max_free_block_size());
+
+}
+
+void display_available_memory(void)
+{
+   msg_printf("available memory: %i (total) %i (Max cont. block)\n", get_free_space(), get_max_free_block_size());
+}
+
 void fatalerror(const char *text, ...)
 {
    va_list arg;
@@ -188,9 +252,12 @@ bool retro_load_game(const struct retro_game_info *info)
 
    pspDebugScreenInitEx(NULL, PSP_DISPLAY_PIXEL_FORMAT_565, 1);
 
-   game_is_loading = true;
+   game_is_loading = true;   
+   display_available_memory();
    ret = machine_main();
+   display_available_memory();
    game_is_loading = false;
+//   return 0;
 
 //   sceGuSync(0,0);
 //   sceGeSaveContext(&njemu_context_buffer);

@@ -67,4 +67,11 @@ extern volatile int Loop;
 extern volatile int Sleep;
 extern char launchDir[MAX_PATH];
 
+int get_free_space(void);
+int get_max_free_block_size(void);
+
+void display_free_space(void);
+void display_max_free_block_size(void);
+void display_available_memory(void);
+
 #endif /* PSP_MAIN_H */
