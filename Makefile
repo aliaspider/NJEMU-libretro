@@ -43,7 +43,9 @@ OBJS    += cpu/m68000/m68000.o cpu/m68000/c68k.o cpu/z80/z80.o cpu/z80/cz80.o
 else
 DEFINES += -DBUILD_NCDZPSP=1
 INCDIRS := -Incdz
-OBJS    := cps2/cps2.o cps2/cps2crpt.o cps2/driver.o cps2/memintrf.o cps2/inptport.o cps2/timer.o cps2/vidhrdw.o cps2/sprite.o cps2/eeprom.o sound/qsound.o
+OBJS    := ncdz/ncdz.o ncdz/cdda.o ncdz/cdrom.o ncdz/driver.o ncdz/memintrf.o ncdz/inptport.o ncdz/timer.o
+OBJS    += ncdz/vidhrdw.o ncdz/sprite.o sound/2610intf.o sound/ym2610.o
+OBJS    += cpu/m68000/m68000.o cpu/m68000/c68k.o cpu/z80/z80.o cpu/z80/cz80.o
 
 endif
 
