@@ -33,6 +33,7 @@ int file_open(const char *fname1, const char *fname2, const UINT32 crc, char *fn
 void file_close(void);
 int file_read(void *buf, size_t length);
 int file_getc(void);
+void file_skip_bytes(int size);
 int rom_load(struct rom_t *rom, UINT8 *mem, int idx, int max);
 #endif
 

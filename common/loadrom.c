@@ -138,6 +138,13 @@ int file_getc(void)
 	return -1;
 }
 
+void file_skip_bytes(int size)
+{
+   if (rom_fd != -1)
+      return zskip(rom_fd, size);
+}
+
+
 
 /*--------------------------------------------------------
 	キャッシュファイルを開く

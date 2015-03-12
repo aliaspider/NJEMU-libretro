@@ -202,6 +202,20 @@ int zsize(int fd)
 	return info.uncompressed_size;
 }
 
+void zskip(int fd, int size)
+{
+   if (unzfile == NULL)
+      sceIoLseek(fd, size, PSP_SEEK_CUR);
+   else
+      while(size > 0)
+      {
+         unzReadCurrentFile(unzfile, zip_cache, 4096);
+         size -= 4096;
+      }
+
+   zip_filepos = 0;
+   zip_cached_len = 0;
+}
 
 /*------------------------------------------------------
 	ZIPファイル内のファイルのサイズを取得

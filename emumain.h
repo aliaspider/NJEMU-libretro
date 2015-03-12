@@ -15,9 +15,13 @@
 #include "zip/zfile.h"
 #include "common/loadrom.h"
 #include "common/state.h"
+
 #if USE_CACHE
 #include "common/cache.h"
+#if (EMU_SYSTEM == CPS2)
+#include "cps2/romcnv.h"
 #endif
+#endif /* USE_CACHE */
 
 #if (EMU_SYSTEM == CPS1 || EMU_SYSTEM == CPS2)
 #include "common/coin.h"
