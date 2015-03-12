@@ -74,7 +74,8 @@ CFLAGS += -fomit-frame-pointer
 #CFLAGS += -falign-functions=32 -falign-loops -falign-labels -falign-jumps
 
 
-OBJS += zip/zfile.o zip/unzip.o
+OBJS += zip/zfile.o
+#OBJS += zip/unzip.o
 OBJS += common/cache.o common/loadrom.o common/state.o
 OBJS += psp/filer.o psp/ui_text.o psp/input.o psp/ticker.o psp/sound.o psp/video.o
 OBJS += sound/sndintrf.o
@@ -102,5 +103,5 @@ clean:
 	rm -f $(OBJS)
 	rm -f $(TARGET)
 
-.PHONY: clean clean-objs
+.PHONY: clean clean-objs $(TARGET)
 

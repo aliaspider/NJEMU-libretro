@@ -72,7 +72,7 @@ int zip_findfirst(struct zip_find_t *file)
 		{
 			unz_file_info info;
 
-			unzGetCurrentFileInfo(unzfile, &info, file->name, MAX_PATH);
+         unzGetCurrentFileInfo(unzfile, &info, file->name, MAX_PATH, NULL, 0, NULL, 0);
 			file->length = info.uncompressed_size;
 			file->crc32 = info.crc;
 			return 1;
@@ -94,7 +94,7 @@ int zip_findnext(struct zip_find_t *file)
 		{
 			unz_file_info info;
 
-			unzGetCurrentFileInfo(unzfile, &info, file->name, MAX_PATH);
+         unzGetCurrentFileInfo(unzfile, &info, file->name, MAX_PATH, NULL, 0, NULL, 0);
 			file->length = info.uncompressed_size;
 			file->crc32 = info.crc;
 			return 1;
@@ -121,7 +121,7 @@ int zopen(const char *filename)
 		return (fd < 0) ? -1 : (int)fd;
 	}
 
-	if (unzLocateFile(unzfile, filename) == UNZ_OK)
+   if (unzLocateFile(unzfile, filename, 0) == UNZ_OK)
 		if (unzOpenCurrentFile(unzfile) == UNZ_OK)
 			return (int)unzfile;
 
@@ -197,7 +197,7 @@ int zsize(int fd)
 		return len;
 	}
 
-	unzGetCurrentFileInfo(unzfile, &info, NULL, 0);
+   unzGetCurrentFileInfo(unzfile, &info, NULL, 0, NULL, 0, NULL, 0);
 
 	return info.uncompressed_size;
 }
