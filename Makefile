@@ -30,7 +30,7 @@ INCDIRS := -Icps2
 OBJS    := cps2/cps2.o cps2/cps2crpt.o cps2/driver.o cps2/memintrf.o cps2/inptport.o cps2/timer.o
 OBJS    += cps2/vidhrdw.o cps2/sprite.o cps2/eeprom.o sound/qsound.o
 OBJS    += cpu/m68000/m68000.o cpu/m68000/c68k.o cpu/z80/z80.o cpu/z80/cz80.o common/coin.o
-OBJS    += cps2/romcnv.o
+OBJS    += cps2/romcnv.o cps2/rominfo.o
 
 ## MVS ##
 else ifeq ($(SYSTEM), mvs)

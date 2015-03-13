@@ -47,6 +47,8 @@ void m68000_write_memory_16(UINT32 offset, UINT16 data);
 UINT8 z80_read_memory_8(UINT32 offset);
 void z80_write_memory_8(UINT32 offset, UINT8 data);
 
+int load_rom_info(const char *game_name);
+
 #ifdef SAVE_STATE
 STATE_SAVE( memory );
 STATE_LOAD( memory );

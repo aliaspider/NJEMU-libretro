@@ -7,6 +7,7 @@
 ******************************************************************************/
 
 #include "cps2.h"
+#include "rominfo.h"
 
 
 #define M68K_AMASK 0x00ffffff
@@ -76,16 +77,12 @@ char cache_parent_name[16];
 
 static struct rom_t cpu1rom[MAX_CPU1ROM];
 static struct rom_t cpu2rom[MAX_CPU2ROM];
-#if !USE_CACHE
-static struct rom_t gfx1rom[MAX_GFX1ROM];
-#endif
+       struct rom_t gfx1rom[MAX_GFX1ROM];
 static struct rom_t snd1rom[MAX_SND1ROM];
 
 static int num_cpu1rom;
 static int num_cpu2rom;
-#if !USE_CACHE
-static int num_gfx1rom;
-#endif
+       int num_gfx1rom;
 static int num_snd1rom;
 
 static UINT8 *static_ram1;
@@ -332,283 +329,87 @@ static int load_rom_user1(void)
 
 
 /*--------------------------------------------------------
-	ROMヌ驤□□ヌゥ`・ソ・ルゥ`・ケ、ヌス簧□
+   ROMヌ驤□□ヌゥ`・ソ・ルゥ`・ケ、ヌス簧□
 --------------------------------------------------------*/
 
-static int load_rom_info(const char *game_name)
+int load_rom_info(const char *game_name)
 {
-	SceUID fd;
-	char path[MAX_PATH];
-	char *buf;
-	char linebuf[256];
-	int i, size;
-	int rom_start = 0;
-	int region = 0;
+   int i;
 
-	num_cpu1rom = 0;
-	num_cpu2rom = 0;
-#if !USE_CACHE
-	num_gfx1rom = 0;
-#endif
-	num_snd1rom = 0;
+   rom_info_t* rom_info = cps2_rom_db;
 
-	machine_driver_type  = 0;
-	machine_input_type   = 0;
-	machine_init_type    = 0;
-	machine_screen_type  = 0;
+   while (rom_info->game_name)
+   {
+      if (stricmp(rom_info->game_name, game_name) == 0)
+      {
+         strcpy(parent_name, rom_info->parent_name);
 
-	sprintf(path, "%srominfo.cps2", launchDir);
+         machine_driver_type  = 0;
+         machine_input_type   = rom_info->machine_input_type;
+         machine_init_type    = rom_info->machine_init_type;
+         machine_screen_type  = rom_info->machine_screen_type;
 
-	if ((fd = sceIoOpen(path, PSP_O_RDONLY, 0777)) >= 0)
-	{
-		size = sceIoLseek(fd, 0, SEEK_END);
-		sceIoLseek(fd, 0, SEEK_SET);
+         memory_length_user1 = rom_info->memory_length_user1;
 
-		if ((buf = (char *)malloc(size)) == NULL)
-		{
-			sceIoClose(fd);
-			return 3;	// ハヨ段、ュ
-		}
+         num_cpu1rom = rom_info->num_cpu1rom;
+         memory_length_cpu1 = rom_info->memory_length_cpu1;
+         for (i = 0; i < rom_info->num_cpu1rom; i++)
+         {
+            cpu1rom[i].type   = rom_info->cpu1rom[i].type;
+            cpu1rom[i].group  = rom_info->cpu1rom[i].group;
+            cpu1rom[i].skip   = rom_info->cpu1rom[i].skip;
+            cpu1rom[i].length = rom_info->cpu1rom[i].length;
+            cpu1rom[i].offset = rom_info->cpu1rom[i].offset;
+            cpu1rom[i].crc    = rom_info->cpu1rom[i].crc;
+            strcpy(cpu1rom[i].name, rom_info->cpu1rom[i].name);
+         }
 
-		sceIoRead(fd, buf, size);
-		sceIoClose(fd);
+         num_cpu2rom = rom_info->num_cpu2rom;
+         memory_length_cpu2 = rom_info->memory_length_cpu2;
+         for (i = 0; i < rom_info->num_cpu2rom; i++)
+         {
+            cpu2rom[i].type   = rom_info->cpu2rom[i].type;
+            cpu2rom[i].group  = rom_info->cpu2rom[i].group;
+            cpu2rom[i].skip   = rom_info->cpu2rom[i].skip;
+            cpu2rom[i].length = rom_info->cpu2rom[i].length;
+            cpu2rom[i].offset = rom_info->cpu2rom[i].offset;
+            cpu2rom[i].crc    = rom_info->cpu2rom[i].crc;
+            strcpy(cpu2rom[i].name, rom_info->cpu2rom[i].name);
+         }
 
-		i = 0;
-		while (i < size)
-		{
-			char *p = &buf[i];
+         num_gfx1rom = rom_info->num_gfx1rom;
+         memory_length_gfx1 = rom_info->memory_length_gfx1;
+         for (i = 0; i < rom_info->num_gfx1rom; i++)
+         {
+            gfx1rom[i].type   = rom_info->gfx1rom[i].type;
+            gfx1rom[i].group  = rom_info->gfx1rom[i].group;
+            gfx1rom[i].skip   = rom_info->gfx1rom[i].skip;
+            gfx1rom[i].length = rom_info->gfx1rom[i].length;
+            gfx1rom[i].offset = rom_info->gfx1rom[i].offset;
+            gfx1rom[i].crc    = rom_info->gfx1rom[i].crc;
+            strcpy(gfx1rom[i].name, rom_info->gfx1rom[i].name);
+         }
 
-			while (buf[i] != '\n' && buf[i] != EOF)
-				i++;
+         num_snd1rom = rom_info->num_snd1rom;
+         memory_length_sound1 = rom_info->memory_length_sound1;
+         for (i = 0; i < rom_info->num_snd1rom; i++)
+         {
+            snd1rom[i].type   = rom_info->snd1rom[i].type;
+            snd1rom[i].group  = rom_info->snd1rom[i].group;
+            snd1rom[i].skip   = rom_info->snd1rom[i].skip;
+            snd1rom[i].length = rom_info->snd1rom[i].length;
+            snd1rom[i].offset = rom_info->snd1rom[i].offset;
+            snd1rom[i].crc    = rom_info->snd1rom[i].crc;
+            strcpy(snd1rom[i].name, rom_info->snd1rom[i].name);
+         }
 
-			buf[i++] = '\0';
+         return 0;
+      }
 
-			strcpy(linebuf, p);
-			strcat(linebuf, "\n");
+      rom_info++;
+   }
 
-			if (linebuf[0] == '/' && linebuf[1] == '/')
-				continue;
-
-			if (linebuf[0] != '\t')
-			{
-				if (linebuf[0] == '\r' || linebuf[0] == '\n')
-				{
-					// クトミミ
-					continue;
-				}
-				else if (str_cmp(linebuf, "FILENAME(") == 0)
-				{
-					char *name, *parent;
-					char *machine, *input, *init, *rotate;
-
-					strtok(linebuf, " ");
-					name    = strtok(NULL, " ,");
-					parent  = strtok(NULL, " ,");
-					machine = strtok(NULL, " ,");
-					input   = strtok(NULL, " ,");
-					init    = strtok(NULL, " ,");
-					rotate  = strtok(NULL, " ");
-
-					if (stricmp(name, game_name) == 0)
-					{
-						if (str_cmp(parent, "cps2") == 0)
-							parent_name[0] = '\0';
-						else
-							strcpy(parent_name, parent);
-
-						sscanf(machine, "%d", &machine_driver_type);
-						sscanf(input, "%d", &machine_input_type);
-						sscanf(init, "%d", &machine_init_type);
-						sscanf(rotate, "%d", &machine_screen_type);
-						rom_start = 1;
-					}
-				}
-				else if (rom_start && str_cmp(linebuf, "END") == 0)
-				{
-					free(buf);
-					return 0;
-				}
-			}
-			else if (rom_start)
-			{
-				if (str_cmp(&linebuf[1], "REGION(") == 0)
-				{
-					char *size, *type, *flag;
-
-					strtok(&linebuf[1], " ");
-					size = strtok(NULL, " ,");
-					type = strtok(NULL, " ,");
-					flag = strtok(NULL, " ");
-
-					if (strcmp(type, "CPU1") == 0)
-					{
-						sscanf(size, "%x", &memory_length_cpu1);
-						region = REGION_CPU1;
-					}
-					else if (strcmp(type, "CPU2") == 0)
-					{
-						sscanf(size, "%x", &memory_length_cpu2);
-						region = REGION_CPU2;
-					}
-					else if (strcmp(type, "GFX1") == 0)
-					{
-						sscanf(size, "%x", &memory_length_gfx1);
-#if USE_CACHE
-						region = REGION_SKIP;
-#else
-						region = REGION_GFX1;
-#endif
-					}
-					else if (strcmp(type, "SOUND1") == 0)
-					{
-						sscanf(size, "%x", &memory_length_sound1);
-						region = REGION_SOUND1;
-					}
-					else if (strcmp(type, "USER1") == 0)
-					{
-						sscanf(size, "%x", &memory_length_user1);
-						region = REGION_SKIP;
-					}
-					else
-					{
-						region = REGION_SKIP;
-					}
-				}
-				else if (str_cmp(&linebuf[1], "ROM(") == 0)
-				{
-					char *type, *name, *offset, *length, *crc;
-
-					strtok(&linebuf[1], " ");
-					type   = strtok(NULL, " ,");
-					if (type[0] != '1')
-						name = strtok(NULL, " ,");
-					else
-						name = NULL;
-					offset = strtok(NULL, " ,");
-					length = strtok(NULL, " ,");
-					crc    = strtok(NULL, " ");
-
-					switch (region)
-					{
-					case REGION_CPU1:
-						sscanf(type, "%x", &cpu1rom[num_cpu1rom].type);
-						sscanf(offset, "%x", &cpu1rom[num_cpu1rom].offset);
-						sscanf(length, "%x", &cpu1rom[num_cpu1rom].length);
-						sscanf(crc, "%x", &cpu1rom[num_cpu1rom].crc);
-						cpu1rom[num_cpu1rom].group = 0;
-						cpu1rom[num_cpu1rom].skip = 0;
-						if (name) strcpy(cpu1rom[num_cpu1rom].name, name);
-						num_cpu1rom++;
-						break;
-
-					case REGION_CPU2:
-						sscanf(type, "%x", &cpu2rom[num_cpu2rom].type);
-						sscanf(offset, "%x", &cpu2rom[num_cpu2rom].offset);
-						sscanf(length, "%x", &cpu2rom[num_cpu2rom].length);
-						sscanf(crc, "%x", &cpu2rom[num_cpu2rom].crc);
-						cpu2rom[num_cpu2rom].group = 0;
-						cpu2rom[num_cpu2rom].skip = 0;
-						if (name) strcpy(cpu2rom[num_cpu2rom].name, name);
-						num_cpu2rom++;
-						break;
-
-#if !USE_CACHE
-					case REGION_GFX1:
-						sscanf(type, "%x", &gfx1rom[num_gfx1rom].type);
-						sscanf(offset, "%x", &gfx1rom[num_gfx1rom].offset);
-						sscanf(length, "%x", &gfx1rom[num_gfx1rom].length);
-						sscanf(crc, "%x", &gfx1rom[num_gfx1rom].crc);
-						gfx1rom[num_gfx1rom].group = 0;
-						gfx1rom[num_gfx1rom].skip = 0;
-						if (name) strcpy(gfx1rom[num_gfx1rom].name, name);
-						num_gfx1rom++;
-						break;
-#endif
-
-					case REGION_SOUND1:
-						sscanf(type, "%x", &snd1rom[num_snd1rom].type);
-						sscanf(offset, "%x", &snd1rom[num_snd1rom].offset);
-						sscanf(length, "%x", &snd1rom[num_snd1rom].length);
-						sscanf(crc, "%x", &snd1rom[num_snd1rom].crc);
-						snd1rom[num_snd1rom].group = 0;
-						snd1rom[num_snd1rom].skip = 0;
-						if (name) strcpy(snd1rom[num_snd1rom].name, name);
-						num_snd1rom++;
-						break;
-					}
-				}
-				else if (str_cmp(&linebuf[1], "ROMX(") == 0)
-				{
-					char *type, *name, *offset, *length, *crc;
-					char *group, *skip;
-
-					strtok(&linebuf[1], " ");
-					type   = strtok(NULL, " ,");
-					if (type[0] != '1')
-						name = strtok(NULL, " ,");
-					else
-						name = NULL;
-					offset = strtok(NULL, " ,");
-					length = strtok(NULL, " ,");
-					crc    = strtok(NULL, " ,");
-					group  = strtok(NULL, " ,");
-					skip   = strtok(NULL, " ");
-
-					switch (region)
-					{
-					case REGION_CPU1:
-						sscanf(type, "%x", &cpu1rom[num_cpu1rom].type);
-						sscanf(offset, "%x", &cpu1rom[num_cpu1rom].offset);
-						sscanf(length, "%x", &cpu1rom[num_cpu1rom].length);
-						sscanf(crc, "%x", &cpu1rom[num_cpu1rom].crc);
-						sscanf(group, "%x", &cpu1rom[num_cpu1rom].group);
-						sscanf(skip, "%x", &cpu1rom[num_cpu1rom].skip);
-						if (name) strcpy(cpu1rom[num_cpu1rom].name, name);
-						num_cpu1rom++;
-						break;
-
-					case REGION_CPU2:
-						sscanf(type, "%x", &cpu2rom[num_cpu2rom].type);
-						sscanf(offset, "%x", &cpu2rom[num_cpu2rom].offset);
-						sscanf(length, "%x", &cpu2rom[num_cpu2rom].length);
-						sscanf(crc, "%x", &cpu2rom[num_cpu2rom].crc);
-						sscanf(group, "%x", &cpu2rom[num_cpu2rom].group);
-						sscanf(skip, "%x", &cpu2rom[num_cpu2rom].skip);
-						if (name) strcpy(cpu2rom[num_cpu2rom].name, name);
-						num_cpu2rom++;
-						break;
-
-#if !USE_CACHE
-					case REGION_GFX1:
-						sscanf(type, "%x", &gfx1rom[num_gfx1rom].type);
-						sscanf(offset, "%x", &gfx1rom[num_gfx1rom].offset);
-						sscanf(length, "%x", &gfx1rom[num_gfx1rom].length);
-						sscanf(crc, "%x", &gfx1rom[num_gfx1rom].crc);
-						sscanf(group, "%x", &gfx1rom[num_gfx1rom].group);
-						sscanf(skip, "%x", &gfx1rom[num_gfx1rom].skip);
-						if (name) strcpy(gfx1rom[num_gfx1rom].name, name);
-						num_gfx1rom++;
-						break;
-#endif
-
-					case REGION_SOUND1:
-						sscanf(type, "%x", &snd1rom[num_snd1rom].type);
-						sscanf(offset, "%x", &snd1rom[num_snd1rom].offset);
-						sscanf(length, "%x", &snd1rom[num_snd1rom].length);
-						sscanf(crc, "%x", &snd1rom[num_snd1rom].crc);
-						sscanf(group, "%x", &snd1rom[num_snd1rom].group);
-						sscanf(skip, "%x", &snd1rom[num_snd1rom].skip);
-						if (name) strcpy(snd1rom[num_snd1rom].name, name);
-						num_snd1rom++;
-						break;
-					}
-				}
-			}
-		}
-		free(buf);
-		return 2;
-	}
-	return 3;
+   return 2;
 }
 
 

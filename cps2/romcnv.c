@@ -42,8 +42,8 @@ static char cache_name[16];
 static FILE* cache_fp;
 
 static int memory_gfx1_current_block;
-static struct rom_t gfx1rom[MAX_GFX1ROM];
-static int num_gfx1rom;
+extern struct rom_t gfx1rom[MAX_GFX1ROM];
+extern int num_gfx1rom;
 
 static UINT8 block_empty_local[0x200];
 
@@ -507,7 +507,8 @@ static void clear_empty_blocks_current_block(void)
       memset(&memory_region_gfx1[0xff0000], 0xff, 0x10000);
    }
    else if (!strcmp(cacheinfo->name, "jyangoku"))
-      memset(memory_region_gfx1, 0xff, 0x800000);
+      for (i = start; i < min(0x800000, end); i += 0x200000)
+         memset(&memory_region_gfx1[i - start], 0xff, 0x200000);
 
    if (cacheinfo->object_end == 0)
       for (i = start; i < min(0x800000, end); i += 0x200000)
@@ -883,139 +884,6 @@ static int load_rom_gfx1_current_block(void)
    return 1;
 }
 
-static int load_rom_info(void)
-{
-   FILE* fp;
-   char path[MAX_PATH];
-   char buf[256];
-   int rom_start = 0;
-   int region = 0;
-
-   num_gfx1rom = 0;
-
-   sprintf(path, "%srominfo.cps2", launchDir);
-
-   if ((fp = fopen(path, "r")) != NULL)
-   {
-      while (fgets(buf, 255, fp))
-      {
-         if (buf[0] == '/' && buf[1] == '/')
-            continue;
-
-         if (buf[0] != '\t')
-         {
-            if (buf[0] == '\r' || buf[0] == '\n')
-               continue;
-            else if (str_cmp(buf, "FILENAME(") == 0)
-            {
-               char* name, *parent;
-
-               strtok(buf, " ");
-               name    = strtok(NULL, " ,");
-               parent  = strtok(NULL, " ,");
-
-               if (strcasecmp(name, game_name) == 0)
-               {
-                  if (str_cmp(parent, "cps2") == 0)
-                     parent_name[0] = '\0';
-                  else
-                     strcpy(parent_name, parent);
-
-                  rom_start = 1;
-               }
-            }
-            else if (rom_start && str_cmp(buf, "END") == 0)
-            {
-               fclose(fp);
-               return 0;
-            }
-         }
-         else if (rom_start)
-         {
-            if (str_cmp(&buf[1], "REGION(") == 0)
-            {
-               char* size, *type;
-
-               strtok(&buf[1], " ");
-               size = strtok(NULL, " ,");
-               type = strtok(NULL, " ,");
-
-               if (strcmp(type, "GFX1") == 0)
-               {
-                  sscanf(size, "%x", &memory_length_gfx1);
-                  region = REGION_GFX1;
-               }
-               else
-                  region = REGION_SKIP;
-            }
-            else if (str_cmp(&buf[1], "ROM(") == 0)
-            {
-               char* type, *name, *offset, *length, *crc;
-
-               strtok(&buf[1], " ");
-               type   = strtok(NULL, " ,");
-               if (type[0] != '1')
-                  name = strtok(NULL, " ,");
-               else
-                  name = NULL;
-               offset = strtok(NULL, " ,");
-               length = strtok(NULL, " ,");
-               crc    = strtok(NULL, " ");
-
-               switch (region)
-               {
-               case REGION_GFX1:
-                  sscanf(type, "%x", &gfx1rom[num_gfx1rom].type);
-                  sscanf(offset, "%x", &gfx1rom[num_gfx1rom].offset);
-                  sscanf(length, "%x", &gfx1rom[num_gfx1rom].length);
-                  sscanf(crc, "%x", &gfx1rom[num_gfx1rom].crc);
-                  if (name) strcpy(gfx1rom[num_gfx1rom].name, name);
-                  gfx1rom[num_gfx1rom].group = 0;
-                  gfx1rom[num_gfx1rom].skip = 0;
-                  num_gfx1rom++;
-                  break;
-               }
-            }
-            else if (str_cmp(&buf[1], "ROMX(") == 0)
-            {
-               char* type, *name, *offset, *length, *crc;
-               char* group, *skip;
-
-               strtok(&buf[1], " ");
-               type   = strtok(NULL, " ,");
-               if (type[0] != '1')
-                  name = strtok(NULL, " ,");
-               else
-                  name = NULL;
-               offset = strtok(NULL, " ,");
-               length = strtok(NULL, " ,");
-               crc    = strtok(NULL, " ,");
-               group  = strtok(NULL, " ,");
-               skip   = strtok(NULL, " ");
-
-               switch (region)
-               {
-               case REGION_GFX1:
-                  sscanf(type, "%x", &gfx1rom[num_gfx1rom].type);
-                  sscanf(offset, "%x", &gfx1rom[num_gfx1rom].offset);
-                  sscanf(length, "%x", &gfx1rom[num_gfx1rom].length);
-                  sscanf(crc, "%x", &gfx1rom[num_gfx1rom].crc);
-                  sscanf(group, "%x", &gfx1rom[num_gfx1rom].group);
-                  sscanf(skip, "%x", &gfx1rom[num_gfx1rom].skip);
-                  if (name) strcpy(gfx1rom[num_gfx1rom].name, name);
-                  num_gfx1rom++;
-                  break;
-               }
-            }
-         }
-      }
-      fclose(fp);
-      return 2;
-   }
-   return 3;
-}
-
-
 static void free_memory(void)
 {
    if (memory_region_gfx1) free(memory_region_gfx1);
@@ -1138,7 +1006,7 @@ int convert_rom(void)
    gfx_pen_usage[1] = NULL;
    gfx_pen_usage[2] = NULL;
 
-   if ((res = load_rom_info()) != 0)
+   if ((res = load_rom_info(game_name)) != 0)
    {
       switch (res)
       {
